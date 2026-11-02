@@ -99,7 +99,12 @@ try {
     }
     else { & git push origin main 2>&1 | Out-Null }
     if ($LASTEXITCODE -ne 0) { throw 'git push / gh repo create fallo.' }
-    & gh repo edit $Repo --description 'Lanzador para jugar la campaña de Half-Life en Sven Co-op con amigos: invitación, reglas, comandos de chat, skins y mods.' --add-topic sven-coop --add-topic half-life --add-topic launcher --add-topic powershell 2>&1 | Out-Null
+    # la descripcion va como JSON UTF-8 desde archivo: por argumento, PowerShell 5.1 estropea los acentos
+    $df = Join-Path ([IO.Path]::GetTempPath()) 'hub-repo-desc.json'
+    [IO.File]::WriteAllText($df, '{"description":"Lanzador para jugar la campaña de Half-Life en Sven Co-op con amigos: invitación, reglas, comandos de chat, skins y mods."}', $utf8)
+    & gh api -X PATCH "repos/$Repo" --input $df 2>&1 | Out-Null
+    Remove-Item $df -Force -ErrorAction SilentlyContinue
+    & gh repo edit $Repo --add-topic sven-coop --add-topic half-life --add-topic launcher --add-topic powershell 2>&1 | Out-Null
     $sha = (& git rev-parse HEAD).Trim()
     $ErrorActionPreference = 'Stop'
 }
