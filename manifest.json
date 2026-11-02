@@ -1,0 +1,30 @@
+{
+    "version":  "1.4.0",
+    "released":  "2026-11-02",
+    "files":  [
+                  {
+                      "path":  "hub.ps1",
+                      "sha256":  "529cb08c5ebcc0f068c5f563fadf94196fd3c91ba0278fc496fb163c384b87e8"
+                  },
+                  {
+                      "path":  "lib.ps1",
+                      "sha256":  "b3163fd5da0254e1252a230078d5e388dc615075a55c8c686fc7d7df1beaeeb4"
+                  },
+                  {
+                      "path":  "update.ps1",
+                      "sha256":  "470d1c87679246a0746eb3396318f466df1ae0e661a889f62594058e3ff1f0a3"
+                  },
+                  {
+                      "path":  "web/index.html",
+                      "sha256":  "2f1276892b313f1b72b5fe3aff6f8e725efd34d144fe1b26d81a1e13042b9415"
+                  },
+                  {
+                      "path":  "plugins/HubTP.as",
+                      "sha256":  "4d8b3f307eb1c2700b5cf441401d2e2a9d5c03000c33d5b129758c9a9d7c84c9"
+                  },
+                  {
+                      "path":  "changelog.json",
+                      "sha256":  "4e26944a6dd00d9ac426472e285bb3d4e38f2919abf066fa99e254ebbd55806b"
+                  }
+              ]
+}
