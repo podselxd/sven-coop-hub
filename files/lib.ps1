@@ -288,11 +288,20 @@ function Start-ThumbWarmer($game) {
 # ================= boton flotante (opcional) =================
 $script:OverlayProc = $null
 
-function Start-Overlay([int]$Port, [string]$Token) {
+function Start-Overlay([int]$Port, [string]$Token, [int]$Button = 1, [int]$Card = 1) {
     Stop-Overlay
     $f = Join-Path $Root 'overlay.ps1'
     if (-not (Test-Path $f)) { return }
-    $script:OverlayProc = Start-Process powershell -PassThru -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-STA', '-WindowStyle', 'Hidden', '-File', "`"$f`"", '-Port', $Port, '-Token', $Token, '-HubPid', $PID, '-Root', "`"$Root`"")
+    $gp = ''; if ($game) { $gp = $game }
+    $script:OverlayProc = Start-Process powershell -PassThru -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-STA', '-WindowStyle', 'Hidden', '-File', "`"$f`"", '-Port', $Port, '-Token', $Token, '-HubPid', $PID, '-Root', "`"$Root`"", '-Game', "`"$gp`"", '-Button', $Button, '-Card', $Card)
+}
+
+# Segun los ajustes: boton flotante (overlay, apagado por defecto) y tarjeta de /tp (tpcard, encendida por defecto)
+function Update-Overlay([int]$Port, [string]$Token) {
+    $s = Read-Settings
+    $btn = 0; if ($s -and $s.overlay) { $btn = 1 }
+    $card = 1; if ($s -and $null -ne $s.tpcard -and -not $s.tpcard) { $card = 0 }
+    if ($btn -or $card) { Start-Overlay $Port $Token $btn $card } else { Stop-Overlay }
 }
 
 function Stop-Overlay {
@@ -308,4 +317,165 @@ function Set-Setting([string]$Name, $Value) {
     if (-not $o) { $o = [pscustomobject]@{} }
     $o | Add-Member -NotePropertyName $Name -NotePropertyValue $Value -Force
     Write-Atomic $SettingsFile ($o | ConvertTo-Json -Depth 8)
+}
+
+
+# ================= mods (mapas, sonidos, modelos... dentro de un .zip) =================
+# Todo va a svencoop_addon (nunca a la carpeta del juego). Cada instalacion guarda la lista exacta de archivos
+# en svencoop_addon\.hubmods\<id>.json, asi se puede quitar sin tocar nada mas.
+$script:ModTopDirs = 'maps', 'models', 'sound', 'sprites', 'scripts', 'gfx', 'media'
+$script:ModAllowedExt = 'bsp', 'res', 'cfg', 'txt', 'wad', 'mdl', 'spr', 'wav', 'mp3', 'ogg', 'tga', 'bmp', 'as', 'png', 'jpg'
+$script:ModBlockedExt = 'dll', 'exe', 'bat', 'cmd', 'ps1', 'psm1', 'vbs', 'js', 'msi', 'com', 'scr', 'lnk', 'jar', 'sh', 'so'
+$script:ModMax = 629145600   # 600 MB
+$script:OpenHosts = 'wootguy.github.io', 'scmapdb.wikidot.com', 'gamebanana.com', 'www.moddb.com', 'svencoop.com', 'www.svencoop.com', 'wiki.svencoop.com', 'steamcommunity.com'
+
+function Get-ModsDb($game) { Join-Path $game 'svencoop_addon\.hubmods' }
+
+# Ruta del zip -> ruta relativa dentro del juego (maps/x.bsp). $null = no es contenido de mod (readme...). Lanza error si es peligrosa.
+function ConvertTo-ModRel([string]$full) {
+    $n = $full.Replace('\', '/').Trim('/')
+    if ($n -match '(^|/)\.\.(/|$)' -or $n -match ':') { throw "ruta no permitida: $full" }
+    $seg = @($n -split '/')
+    if ($seg.Count -gt 1 -and @('svencoop_addon', 'svencoop', 'svencoop_downloads') -contains $seg[0].ToLower()) { $seg = @($seg[1..($seg.Count - 1)]) }
+    if ($seg.Count -gt 1 -and ($script:ModTopDirs -notcontains $seg[0].ToLower()) -and ($script:ModTopDirs -contains $seg[1].ToLower())) { $seg = @($seg[1..($seg.Count - 1)]) }   # carpeta envoltorio
+    if ($seg.Count -lt 2 -or ($script:ModTopDirs -notcontains $seg[0].ToLower())) { return $null }
+    foreach ($s in $seg) { if ($s -notmatch "^[A-Za-z0-9 _.\-&()\[\]']+$" -or $s.EndsWith('.') -or $s.EndsWith(' ')) { throw "nombre de archivo no permitido: $s" } }
+    return ($seg -join '/')
+}
+
+# Paso 1: guarda el zip subido (sin instalar) y devuelve un resumen para que la persona confirme
+function Save-PendingMod($game, $ctx, [string]$fileName) {
+    $pdir = Join-Path $Root 'cache\pending'
+    New-Item -ItemType Directory -Force $pdir | Out-Null
+    Get-ChildItem $pdir -File -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -lt (Get-Date).AddHours(-2) } | Remove-Item -Force -ErrorAction SilentlyContinue
+    if ($ctx.Request.ContentLength64 -gt $script:ModMax) { throw 'El archivo es demasiado grande (max 600 MB).' }
+    $id = [guid]::NewGuid().ToString('N').Substring(0, 12)
+    $zipPath = Join-Path $pdir "$id.zip"
+    $fs = [IO.File]::Create($zipPath)
+    try { $ctx.Request.InputStream.CopyTo($fs) } finally { $fs.Close() }
+    try {
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        try { $zip = [IO.Compression.ZipFile]::OpenRead($zipPath) } catch { throw 'No es un .zip valido.' }
+        try {
+            $files = New-Object System.Collections.Generic.List[object]
+            $total = [long]0; $blocked = $null; $conf = New-Object System.Collections.Generic.List[string]
+            $hasScripts = $false; $skinOnly = $true; $ignored = 0; $dirs = @{}
+            foreach ($e in $zip.Entries) {
+                if (-not $e.Name) { continue }
+                $ext = [IO.Path]::GetExtension($e.Name).TrimStart('.').ToLower()
+                if ($script:ModBlockedExt -contains $ext) { if (-not $blocked) { $blocked = $e.Name }; continue }
+                $rel = ConvertTo-ModRel $e.FullName
+                if (-not $rel -or ($script:ModAllowedExt -notcontains $ext)) { $ignored++; continue }
+                $total += $e.Length
+                if ($total -gt $script:ModMax) { throw 'Demasiado grande al descomprimir (max 600 MB).' }
+                if ($files.Count -ge 6000) { throw 'Demasiados archivos (max 6000).' }
+                $files.Add(@{ entry = $e.FullName; rel = $rel; size = $e.Length })
+                $top = $rel.Split('/')[0]; if ($dirs.ContainsKey($top)) { $dirs[$top]++ } else { $dirs[$top] = 1 }
+                if ($ext -eq 'as' -and $rel -like 'scripts/*') { $hasScripts = $true }
+                if ($rel -notlike 'models/player/*') { $skinOnly = $false }
+                $w = $rel.Replace('/', '\')
+                if ([IO.File]::Exists((Join-Path $game "svencoop_addon\$w")) -or [IO.File]::Exists((Join-Path $game "svencoop\$w"))) { $conf.Add($rel) }
+            }
+        }
+        finally { $zip.Dispose() }
+        if ($blocked) { throw "El zip incluye programas ($blocked). Por seguridad no se instala." }
+        if ($files.Count -eq 0) { throw 'No encontre archivos de mods (maps, models, sound...).' }
+        $name = [IO.Path]::GetFileNameWithoutExtension($fileName) -replace "[^A-Za-z0-9 _.\-&()]", ''
+        if (-not $name.Trim()) { $name = "mod-$id" }
+        if ($name.Length -gt 60) { $name = $name.Substring(0, 60) }
+        Write-Atomic (Join-Path $pdir "$id.json") (@{ id = $id; name = $name.Trim(); total = $total; files = $files.ToArray() } | ConvertTo-Json -Depth 5)
+        return @{
+            id = $id; name = $name.Trim(); count = $files.Count; mb = [math]::Round($total / 1MB, 1)
+            hasScripts = $hasScripts; kind = $(if ($skinOnly) { 'skin' } else { 'mod' })
+            conflictCount = $conf.Count; conflicts = @($conf | Select-Object -First 6); dirs = $dirs; ignored = $ignored
+        }
+    }
+    catch { Remove-Item $zipPath -Force -ErrorAction SilentlyContinue; throw }
+}
+
+# Paso 2: instala lo que se confirmo. Si algo falla, borra lo que ya habia copiado.
+function Install-PendingMod($game, [string]$id) {
+    if ($id -notmatch '^[a-f0-9]{12}$') { throw 'Id no valido.' }
+    $zipPath = Join-Path $Root "cache\pending\$id.zip"
+    $planPath = Join-Path $Root "cache\pending\$id.json"
+    if (-not (Test-Path $zipPath) -or -not (Test-Path $planPath)) { throw 'La subida caduco: vuelve a arrastrar el .zip.' }
+    $plan = Get-Content $planPath -Raw | ConvertFrom-Json
+    $addon = [IO.Path]::GetFullPath((Join-Path $game 'svencoop_addon')) + '\'
+    foreach ($f in $plan.files) {
+        $w = "$($f.rel)".Replace('/', '\')
+        if ([IO.File]::Exists((Join-Path $game "svencoop_addon\$w")) -or [IO.File]::Exists((Join-Path $game "svencoop\$w"))) { throw "Ya existe $($f.rel): quita primero el otro mod." }
+    }
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $zip = [IO.Compression.ZipFile]::OpenRead($zipPath)
+    $created = New-Object System.Collections.Generic.List[string]
+    try {
+        $byName = @{}
+        foreach ($e in $zip.Entries) { $byName[$e.FullName] = $e }
+        foreach ($f in $plan.files) {
+            $full = [IO.Path]::GetFullPath((Join-Path $game ('svencoop_addon\' + "$($f.rel)".Replace('/', '\'))))
+            if (-not $full.StartsWith($addon, [StringComparison]::OrdinalIgnoreCase)) { throw 'Ruta no permitida.' }
+            New-Item -ItemType Directory -Force ([IO.Path]::GetDirectoryName($full)) | Out-Null
+            [IO.Compression.ZipFileExtensions]::ExtractToFile($byName["$($f.entry)"], $full, $false)
+            $created.Add($full)
+        }
+    }
+    catch { foreach ($c in $created) { Remove-Item $c -Force -ErrorAction SilentlyContinue }; throw }
+    finally { $zip.Dispose() }
+    $db = Get-ModsDb $game
+    New-Item -ItemType Directory -Force $db | Out-Null
+    Write-Atomic (Join-Path $db "$id.json") (@{ id = $id; name = "$($plan.name)"; date = (Get-Date -Format 'yyyy-MM-dd'); mb = [math]::Round($plan.total / 1MB, 1); files = @($plan.files | ForEach-Object { "$($_.rel)" }) } | ConvertTo-Json -Depth 4)
+    Remove-Item $zipPath, $planPath -Force -ErrorAction SilentlyContinue
+    Reset-ModelCache
+    return @{ id = $id; name = "$($plan.name)"; count = $created.Count }
+}
+
+function Get-InstalledMods($game) {
+    $db = Get-ModsDb $game
+    if (-not (Test-Path $db)) { return @() }
+    $out = @()
+    foreach ($f in (Get-ChildItem $db -Filter '*.json' -ErrorAction SilentlyContinue)) {
+        try { $m = Get-Content $f.FullName -Raw | ConvertFrom-Json; $out += @{ id = "$($m.id)"; name = "$($m.name)"; date = "$($m.date)"; mb = $m.mb; count = @($m.files).Count } } catch {}
+    }
+    return @($out | Sort-Object { $_.name })
+}
+
+# Quita un mod: solo los archivos que instalo el Hub, a la Papelera de reciclaje
+function Remove-Mod($game, [string]$id) {
+    if ($id -notmatch '^[a-f0-9]{12}$') { throw 'Id no valido.' }
+    $mf = Join-Path (Get-ModsDb $game) "$id.json"
+    if (-not (Test-Path $mf)) { throw 'Ese mod no esta instalado.' }
+    $m = Get-Content $mf -Raw | ConvertFrom-Json
+    $addonRoot = [IO.Path]::GetFullPath((Join-Path $game 'svencoop_addon'))
+    Add-Type -AssemblyName Microsoft.VisualBasic
+    $dirs = New-Object System.Collections.Generic.HashSet[string]
+    foreach ($rel in @($m.files)) {
+        $full = [IO.Path]::GetFullPath((Join-Path $game ('svencoop_addon\' + "$rel".Replace('/', '\'))))
+        if (-not $full.StartsWith($addonRoot + '\', [StringComparison]::OrdinalIgnoreCase)) { continue }
+        if ([IO.File]::Exists($full)) {
+            [Microsoft.VisualBasic.FileIO.FileSystem]::DeleteFile($full, 'OnlyErrorDialogs', 'SendToRecycleBin')
+            [void]$dirs.Add([IO.Path]::GetDirectoryName($full))
+        }
+    }
+    # carpetas que quedaron vacias (sin tocar la raiz de svencoop_addon)
+    foreach ($d in ($dirs | Sort-Object { $_.Length } -Descending)) {
+        $cur = $d
+        while ($cur.Length -gt $addonRoot.Length -and [IO.Directory]::Exists($cur) -and -not (Get-ChildItem $cur -Force -ErrorAction SilentlyContinue)) {
+            Remove-Item $cur -Force -ErrorAction SilentlyContinue
+            $cur = [IO.Path]::GetDirectoryName($cur)
+        }
+    }
+    Remove-Item $mf -Force
+    Reset-ModelCache
+}
+
+# Abre un sitio en el navegador, solo de una lista fija (el Hub no abre direcciones arbitrarias)
+function Open-AllowedUrl([string]$Url) {
+    $u = $null
+    if (-not [Uri]::TryCreate($Url, [UriKind]::Absolute, [ref]$u) -or ($u.Scheme -notin 'https', 'http') -or ($script:OpenHosts -notcontains $u.Host)) { throw 'Direccion no permitida.' }
+    Start-Process $u.AbsoluteUri
+}
+
+function Remove-PendingMod([string]$id) {
+    if ($id -notmatch '^[a-f0-9]{12}$') { return }
+    Remove-Item (Join-Path $Root "cache\pending\$id.zip"), (Join-Path $Root "cache\pending\$id.json") -Force -ErrorAction SilentlyContinue
 }

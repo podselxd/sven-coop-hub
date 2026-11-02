@@ -538,7 +538,7 @@ $lastPing = Get-Date
 $edgeProc = Open-Window "http://127.0.0.1:$port/?t=$token"
 $script:WantTab = ''
 $headless = $null
-if ((Read-Settings).overlay) { Start-Overlay $port $token }
+Update-Overlay $port $token
 # mientras Edge arranca (~1 s) se calientan las cachés: la primera peticion de la pagina ya las encuentra listas
 if ($game) {
     $mapsCache = Get-InstalledMaps $game
@@ -581,7 +581,7 @@ try {
                 Send $ctx '{"error":"404"}' 'application/json' 404; continue
             }
             if (-not $authed) { Send $ctx '{"error":"no autorizado"}' 'application/json' 403; continue }
-            if (-not $game -and $path -in '/api/launch', '/api/cmd', '/api/bind', '/api/autolan', '/api/repair', '/api/undo', '/api/skinadd', '/api/skindel') {
+            if (-not $game -and $path -in '/api/launch', '/api/cmd', '/api/bind', '/api/autolan', '/api/repair', '/api/undo', '/api/skinadd', '/api/skindel', '/api/modupload', '/api/modinstall', '/api/mods', '/api/moddel', '/api/modcancel', '/api/openurl') {
                 Send $ctx @{ ok = $false; error = 'No encuentro Sven Co-op. Instalalo desde Steam.' }; continue
             }
             switch ($path) {
@@ -599,9 +599,15 @@ try {
                 }
                 '/api/overlay' {
                     $p = (Read-Body $ctx) | ConvertFrom-Json
-                    if ($p.enabled) { Start-Overlay $port $token } else { Stop-Overlay }
                     Set-Setting 'overlay' ([bool]$p.enabled)
-                    Send $ctx @{ ok = $true; overlay = (Test-OverlayOn) }
+                    Update-Overlay $port $token
+                    Send $ctx @{ ok = $true; overlay = [bool]$p.enabled; running = (Test-OverlayOn) }
+                }
+                '/api/tpcard' {
+                    $p = (Read-Body $ctx) | ConvertFrom-Json
+                    Set-Setting 'tpcard' ([bool]$p.enabled)
+                    Update-Overlay $port $token
+                    Send $ctx @{ ok = $true; tpcard = [bool]$p.enabled }
                 }
                 '/api/update' {
                     $p = (Read-Body $ctx) | ConvertFrom-Json
@@ -616,6 +622,27 @@ try {
                 '/api/skindel' {
                     $p = (Read-Body $ctx) | ConvertFrom-Json
                     try { Remove-Skin $game "$($p.name)"; Send $ctx @{ ok = $true } }
+                    catch { Send $ctx @{ ok = $false; error = $_.Exception.Message } }
+                }
+                '/api/modupload' {
+                    try { Send $ctx (@{ ok = $true } + (Save-PendingMod $game $ctx "$($ctx.Request.QueryString['file'])")) }
+                    catch { Send $ctx @{ ok = $false; error = $_.Exception.Message } }
+                }
+                '/api/modinstall' {
+                    $p = (Read-Body $ctx) | ConvertFrom-Json
+                    try { Send $ctx (@{ ok = $true } + (Install-PendingMod $game "$($p.id)")) }
+                    catch { Send $ctx @{ ok = $false; error = $_.Exception.Message } }
+                }
+                '/api/modcancel' { $p = (Read-Body $ctx) | ConvertFrom-Json; Remove-PendingMod "$($p.id)"; Send $ctx @{ ok = $true } }
+                '/api/mods' { Send $ctx @{ mods = @(Get-InstalledMods $game) } }
+                '/api/moddel' {
+                    $p = (Read-Body $ctx) | ConvertFrom-Json
+                    try { Remove-Mod $game "$($p.id)"; Send $ctx @{ ok = $true } }
+                    catch { Send $ctx @{ ok = $false; error = $_.Exception.Message } }
+                }
+                '/api/openurl' {
+                    $p = (Read-Body $ctx) | ConvertFrom-Json
+                    try { Open-AllowedUrl "$($p.url)"; Send $ctx @{ ok = $true } }
                     catch { Send $ctx @{ ok = $false; error = $_.Exception.Message } }
                 }
                 '/api/diag' { Send $ctx @{ text = (Get-Diag $game $user) } }

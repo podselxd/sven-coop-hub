@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.6.0",
+    "date": "2026-11-02",
+    "notes": [
+      "Nueva pestaña Mods: sitios para descargar skins, mapas y mods, e instalador de .zip que se puede quitar.",
+      "Skins: el botón de eliminar ya se ve siempre y también está en el panel lateral.",
+      "Al hacer /tp aparece una tarjeta con la skin y el nombre de la persona (/card muestra la tuya)."
+    ]
+  },
+  {
     "version": "1.5.0",
     "date": "2026-11-02",
     "notes": [

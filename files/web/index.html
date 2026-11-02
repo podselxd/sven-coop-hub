@@ -180,13 +180,26 @@ textarea{resize:vertical}
 .thumb .ph{position:absolute;inset:0;display:grid;place-items:center;font:700 36px Bahnschrift;color:#2f3642}
 .sk .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:0}
 .sk .tag{position:absolute;top:12px;left:12px;background:var(--hev);color:#1a1100;font:700 9px Bahnschrift;letter-spacing:.08em;padding:2px 7px;border-radius:99px;font-style:normal}
-.sk .acts{position:absolute;top:12px;right:12px;display:flex;gap:4px;opacity:0;transition:.12s}
+.sk .acts{position:absolute;top:12px;right:12px;display:flex;gap:4px;opacity:.75;transition:.12s}
 .sk:hover .acts,.sk:focus-within .acts{opacity:1}
 .sk .acts button{background:#0b0c0fd9;border:1px solid #ffffff22;color:#e8eaee;border-radius:7px;width:27px;height:27px;display:grid;place-items:center;cursor:pointer;padding:0}
 .sk .acts button.act-on{color:var(--hev)}
 .sk .acts button.del:hover{color:var(--bad);border-color:var(--bad)}
 .drop{border:1.5px dashed #3a414d;border-radius:10px;padding:18px 12px;text-align:center;color:var(--mute);font-size:12.5px;margin-top:16px;transition:.12s}
 #view-skins.drag .drop{border-color:var(--hev);color:var(--hev);background:#2a1f0c}
+.curacts{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.curacts .btn{display:inline-flex;align-items:center;gap:6px}
+.btn.danger{color:var(--bad)}
+.btn.danger:hover{border-color:var(--bad)}
+#view-mods{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+.sites{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.site{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;text-align:left;cursor:pointer;color:var(--text);font:inherit;display:flex;flex-direction:column;gap:4px;transition:.12s}
+.site:hover{border-color:var(--hev);transform:translateY(-2px)}
+.site b{font:700 15px Bahnschrift;letter-spacing:.04em;color:var(--hev);text-transform:uppercase}
+.site span{color:var(--text);font-size:13px}
+.site em{font-style:normal;color:var(--mute);font-size:11.5px;margin-top:4px}
+.drop.big{padding:34px 14px;font-size:14px;margin-top:0}
+#view-mods.drag .drop{border-color:var(--hev);color:var(--hev);background:#2a1f0c}
 .hidden{display:none!important}
 .single{grid-column:1/-1;max-width:760px;margin:0 auto;width:100%}
 @media(max-width:900px){main{grid-template-columns:1fr}.rules{grid-template-columns:1fr}}
@@ -205,6 +218,7 @@ textarea{resize:vertical}
     <button id="tab-join">Unirme</button>
     <button id="tab-cmds">Comandos</button>
     <button id="tab-skins">Skins</button>
+    <button id="tab-mods">Mods</button>
     <button id="tab-ajustes">Ajustes</button>
   </nav>
   <div class="pills">
@@ -259,6 +273,7 @@ textarea{resize:vertical}
     <div class="rule"><div><b>Minimizar el Hub al iniciar</b></div><label class="sw"><input type="checkbox" id="r-minimize"><i></i></label></div>
     <div class="rule"><div><b>Copiar invitación al iniciar</b></div><label class="sw"><input type="checkbox" id="r-autocopy"><i></i></label></div>
     <div class="rule"><div><b>Botón flotante en el juego</b><span>Clic o F9 abre Comandos · arrástralo · clic derecho lo oculta</span></div><label class="sw"><input type="checkbox" id="r-overlay"><i></i></label></div>
+    <div class="rule"><div><b>Tarjeta al hacer /tp</b><span>Skin y nombre de la persona, arriba al centro</span></div><label class="sw"><input type="checkbox" id="r-tpcard"><i></i></label></div>
   </section>
   <section class="card">
     <h2>Avanzado</h2>
@@ -325,7 +340,21 @@ textarea{resize:vertical}
     <label>Color de abajo <i class="sw-c" id="sk-bot-sw"></i><em id="sk-bot-v"></em></label>
     <input type="range" id="sk-bot" min="0" max="255">
     <button class="btn pri" id="sk-apply" style="width:100%;margin-top:16px">Aplicar colores</button>
+    <div class="curacts" id="sk-cur"></div>
     <div class="drop" id="sk-drop">Suelta aquí un .zip<br>o los archivos .mdl y .bmp</div>
+  </aside>
+</main>
+<main id="view-mods" class="hidden">
+  <section class="card">
+    <h2>Descargar</h2>
+    <div class="sites" id="mod-sites"></div>
+  </section>
+  <aside class="card">
+    <h2>Instalar</h2>
+    <div class="drop big" id="mod-drop">Suelta aquí el .zip<div style="margin-top:12px"><button class="btn pri" id="mod-pick">Elegir .zip</button></div></div>
+    <input type="file" id="mod-file" accept=".zip" hidden>
+    <h2 style="margin-top:22px">Instalados</h2>
+    <div class="friends" id="mod-list"></div>
   </aside>
 </main>
 <main id="view-ajustes" class="hidden">
@@ -374,7 +403,7 @@ const CHAPTERS=[
  ['hl_c07_a1','On A Rail'],['hl_c08_a1','Apprehension'],['hl_c09','Residue Processing'],['hl_c10','Questionable Ethics'],
  ['hl_c11_a1','Surface Tension'],['hl_c12','Forget About Freeman!'],['hl_c13_a1','Lambda Core'],['hl_c14','Xen'],
  ['hl_c15',"Gonarch's Lair"],['hl_c16_a1','Interloper'],['hl_c17','Nihilanth'],['hl_c18','Endgame']];
-const DEF={map:'hl_c00',maxplayers:8,cheats:true,respawn:5,classic:true,survival:-1,screen:'full',minimize:true,logo:'hex',fav:[],hid:[],overlay:false,model:'',top:0,bottom:0,extra:'',autoCopy:true,friends:[],hosts:[],lastJoin:''};
+const DEF={map:'hl_c00',maxplayers:8,cheats:true,respawn:5,classic:true,survival:-1,screen:'full',minimize:true,logo:'hex',fav:[],hid:[],overlay:false,tpcard:true,model:'',top:0,bottom:0,extra:'',autoCopy:true,friends:[],hosts:[],lastJoin:''};
 let S={...DEF}, info={}, running=false;
 const $=id=>document.getElementById(id);
 async function api(p,body){
@@ -399,7 +428,7 @@ function render(){
   const have=new Set(info.maps||[]);
   $('chapters').innerHTML=CHAPTERS.filter(c=>!info.maps||have.has(c[0])).map((c,i)=>
     `<button class="ch ${c[0]===S.map?'on':''}" data-m="${c[0]}"><div class="n">CAP ${String(CHAPTERS.indexOf(c)).padStart(2,'0')} · ${c[0]}</div><div class="t">${c[1]}</div></button>`).join('');
-  $('r-cheats').checked=S.cheats;$('r-classic').checked=S.classic;$('r-autocopy').checked=S.autoCopy;$('r-minimize').checked=S.minimize!==false;$('r-overlay').checked=!!S.overlay;
+  $('r-cheats').checked=S.cheats;$('r-classic').checked=S.classic;$('r-autocopy').checked=S.autoCopy;$('r-minimize').checked=S.minimize!==false;$('r-overlay').checked=!!S.overlay;$('r-tpcard').checked=S.tpcard!==false;
   $('r-respawn').value=S.respawn;$('r-max').value=S.maxplayers;$('v-max').textContent=S.maxplayers;$('r-extra').value=S.extra;
   $('r-autolan').checked=!!info.autoLan;
   document.querySelectorAll('#r-screen button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.screen));
@@ -448,6 +477,7 @@ $('r-extra').oninput=e=>{S.extra=e.target.value;save();$('cmds').innerHTML=['<sp
 $('r-screen').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.screen=b.dataset.v;save();render()};
 $('r-survival').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.survival=+b.dataset.v;save();render()};
 $('r-overlay').onchange=async e=>{S.overlay=e.target.checked;save();const r=await api('overlay',{enabled:S.overlay});toast(r.overlay?'Botón flotante activado':'Botón flotante desactivado')};
+$('r-tpcard').onchange=async e=>{S.tpcard=e.target.checked;save();await api('tpcard',{enabled:S.tpcard});toast(S.tpcard?'Tarjeta de /tp activada':'Tarjeta de /tp desactivada')};
 $('r-autolan').onchange=async e=>{const r=await api('autolan',{enabled:e.target.checked});info.autoLan=r.autoLan;toast(r.autoLan?'sv_lan 0 se aplicará en todo multijugador':'Quitado de listenserver.cfg')};
 $('copy-id').onclick=()=>copy(info.steamId,'Código copiado');
 $('copy-invite').onclick=()=>copy(invite(),'Invitación copiada, pégala en Discord');
@@ -476,13 +506,14 @@ $('hosts').onclick=e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.use!==undefined){$('j-text').value='connect '+S.hosts[b.dataset.use].id;S.lastJoin=$('j-text').value;save();renderJoin();if(!$('go-join').disabled)$('go-join').click()}
   if(b.dataset.delh!==undefined){S.hosts.splice(b.dataset.delh,1);save();renderJoin()}};
 function tab(t){
-  for(const v of ['host','reglas','join','cmds','skins','ajustes']){$('view-'+v).classList.toggle('hidden',t!==v);$('tab-'+v).classList.toggle('on',t===v)}
+  for(const v of ['host','reglas','join','cmds','skins','mods','ajustes']){$('view-'+v).classList.toggle('hidden',t!==v);$('tab-'+v).classList.toggle('on',t===v)}
   $('dock').classList.toggle('hidden',t!=='host'&&t!=='reglas');
   if(t==='cmds')renderCmds();
   if(t==='skins')renderSkins();
+  if(t==='mods'){renderSites();loadMods()}
   if(t==='ajustes'){loadHealth();renderAbout();checkUpdate()}
 }
-$('tab-host').onclick=()=>tab('host');$('tab-join').onclick=()=>tab('join');$('tab-reglas').onclick=()=>tab('reglas');$('dock-rules').onclick=()=>tab('reglas');$('tab-cmds').onclick=()=>tab('cmds');$('tab-skins').onclick=()=>tab('skins');$('tab-ajustes').onclick=()=>tab('ajustes');
+$('tab-host').onclick=()=>tab('host');$('tab-join').onclick=()=>tab('join');$('tab-reglas').onclick=()=>tab('reglas');$('dock-rules').onclick=()=>tab('reglas');$('tab-cmds').onclick=()=>tab('cmds');$('tab-skins').onclick=()=>tab('skins');$('tab-mods').onclick=()=>tab('mods');$('tab-ajustes').onclick=()=>tab('ajustes');
 
 // ---- skins ----
 const hue=v=>`hsl(${Math.round(v/255*360)} 85% 50%)`;
@@ -522,23 +553,27 @@ function renderSkins(){
   const shown=all.filter(m=>skFilter==='hid'?!vis(m):vis(m)&&(skFilter==='fav'?inL(S.fav,m.name):skFilter==='mine'?m.custom:true))
     .filter(m=>m.name.toLowerCase().includes(q)).sort((a,b)=>inL(S.fav,b.name)-inL(S.fav,a.name));
   $('skins').innerHTML=shown.map(m=>skinCard(m,cur)).join('')||'<div class="note">Nada por aquí.</div>';
+  const cm=all.find(m=>m.name.toLowerCase()===cur.toLowerCase());
+  $('sk-cur').innerHTML=cm?`<button class="btn sm" data-a="fav" data-m="${esc(cm.name)}">${inL(S.fav,cm.name)?IC.starOn:IC.star} Favorita</button><button class="btn sm" data-a="hide" data-m="${esc(cm.name)}">${IC.hide} Ocultar</button>${cm.custom?`<button class="btn sm danger" data-a="del" data-m="${esc(cm.name)}">${IC.del} Eliminar</button>`:''}`:'';
 }
 $('sk-search').oninput=renderSkins;
 $('sk-filters').onclick=e=>{const b=e.target.closest('button');if(!b)return;skFilter=b.dataset.f;renderSkins()};
-$('skins').onclick=async e=>{
-  const c=e.target.closest('.sk');if(!c)return;const name=c.dataset.m,a=e.target.closest('[data-a]');
-  if(a){
-    if(a.dataset.a==='fav')toggleL('fav',name);
-    else if(a.dataset.a==='hide')toggleL('hid',name);
-    else if(a.dataset.a==='del'){
-      if(!confirm('¿Eliminar la skin '+name+'? Va a la Papelera de reciclaje.'))return;
-      const r=await api('skindel',{name});if(!r.ok){toast(r.error||'No se pudo eliminar');return}
-      info=await api('state');toast('Skin eliminada');
-    }
-    save();renderSkins();return;
+async function skinAction(name,act){
+  if(act==='fav')toggleL('fav',name);
+  else if(act==='hide')toggleL('hid',name);
+  else if(act==='del'){
+    if(!confirm('¿Eliminar la skin '+name+'? Va a la Papelera de reciclaje.'))return;
+    const r=await api('skindel',{name});if(!r.ok){toast(r.error||'No se pudo eliminar');return}
+    info=await api('state');toast('Skin eliminada');
   }
+  save();renderSkins();
+}
+$('skins').onclick=e=>{
+  const c=e.target.closest('.sk');if(!c)return;const name=c.dataset.m,a=e.target.closest('[data-a]');
+  if(a){skinAction(name,a.dataset.a);return}
   S.model=name;save();renderSkins();if(running)sendCmd(['model '+name],'Skin '+name);else toast('Skin '+name);
 };
+$('sk-cur').onclick=e=>{const b=e.target.closest('[data-a]');if(b)skinAction(b.dataset.m,b.dataset.a)};
 for(const [id,k] of [['sk-top','top'],['sk-bot','bottom']])$(id).oninput=e=>{S[k]=+e.target.value;if(!S.model)S.model=curModel();save();renderSkins()};
 $('sk-apply').onclick=()=>{if(running)sendCmd(['topcolor '+S.top,'bottomcolor '+S.bottom],'Colores');else toast('Colores guardados')};
 
@@ -585,6 +620,65 @@ window.addEventListener('drop',e=>e.preventDefault());
 $('view-skins').addEventListener('dragover',e=>{e.preventDefault();$('view-skins').classList.add('drag')});
 $('view-skins').addEventListener('dragleave',e=>{if(!e.relatedTarget||!$('view-skins').contains(e.relatedTarget))$('view-skins').classList.remove('drag')});
 $('view-skins').addEventListener('drop',e=>{e.preventDefault();$('view-skins').classList.remove('drag');addSkins(e.dataTransfer.files)});
+
+// ---- mods ----
+const SITES=[
+  {t:'Skins',d:'Sven Co-op Model Database',u:'https://wootguy.github.io/pmodels/sc/',h:'wootguy.github.io'},
+  {t:'Mapas y campañas',d:'SCMapDB',u:'http://scmapdb.wikidot.com/',h:'scmapdb.wikidot.com'},
+  {t:'Mods, sonidos y scripts',d:'GameBanana',u:'https://gamebanana.com/games/54',h:'gamebanana.com'},
+  {t:'Addons y modelos',d:'ModDB',u:'https://www.moddb.com/games/sven-co-op',h:'moddb.com'},
+  {t:'Oficial',d:'svencoop.com · archivos y noticias',u:'https://svencoop.com/',h:'svencoop.com'},
+  {t:'Wiki',d:'Guías y documentación',u:'https://wiki.svencoop.com/',h:'wiki.svencoop.com'},
+  {t:'Comunidad',d:'Steam Community',u:'https://steamcommunity.com/app/225840',h:'steamcommunity.com'}];
+function renderSites(){
+  $('mod-sites').innerHTML=SITES.map((x,i)=>`<button class="site" data-i="${i}"><b>${x.t}</b><span>${x.d}</span><em>${x.h} ↗</em></button>`).join('');
+}
+$('mod-sites').onclick=async e=>{const b=e.target.closest('.site');if(!b)return;const r=await api('openurl',{url:SITES[b.dataset.i].u});if(!r.ok)toast(r.error||'No se pudo abrir')};
+const busyOn=t=>{$('busy-t').textContent=t;$('busy').classList.remove('hidden')},busyOff=()=>$('busy').classList.add('hidden');
+function upload(path,file,onp){return new Promise(res=>{
+  const x=new XMLHttpRequest();x.open('POST','/api/'+path+'?file='+encodeURIComponent(file.name));x.setRequestHeader('X-Hub',TOKEN);
+  x.upload.onprogress=e=>{if(e.lengthComputable&&onp)onp(Math.round(e.loaded/e.total*100))};
+  x.onload=()=>{try{res(JSON.parse(x.responseText))}catch(e){res({ok:false,error:'Respuesta no válida del Hub'})}};
+  x.onerror=()=>res({ok:false,error:'El Hub no responde'});x.send(file)})}
+let modBusy=false;
+async function installMod(file){
+  if(modBusy)return;
+  if(!file||!/\.zip$/i.test(file.name)){toast('Usa un archivo .zip');return}
+  modBusy=true;
+  try{
+    busyOn('Subiendo 0%…');
+    const r=await upload('modupload',file,p=>{$('busy-t').textContent='Subiendo '+p+'%…'});
+    busyOff();
+    if(!r.ok){toast(r.error||'No se pudo leer el zip');return}
+    if(r.kind==='skin'){
+      if(confirm(`"${r.name}" parece una skin. ¿Instalarla en Skins?`)){await api('modcancel',{id:r.id});await addSkins([file]);tab('skins')}else await api('modcancel',{id:r.id});
+      return;
+    }
+    if(r.conflictCount){await api('modcancel',{id:r.id});alert(`No se puede instalar: ya existen ${r.conflictCount} archivo(s), por ejemplo:\n${r.conflicts.join('\n')}\n\nQuita primero el otro mod.`);return}
+    const lines=[`Instalar "${r.name}"`,`${r.count} archivos · ${r.mb} MB`,Object.entries(r.dirs||{}).map(([k,v])=>`${k}: ${v}`).join(' · ')];
+    if(r.hasScripts)lines.push('','⚠ Incluye scripts (.as) que se ejecutan en el juego. Instala solo mods de gente de confianza.');
+    if(!confirm(lines.join('\n')+'\n\n¿Instalar?')){await api('modcancel',{id:r.id});return}
+    busyOn('Instalando…');const i=await api('modinstall',{id:r.id});busyOff();
+    if(!i.ok){toast(i.error||'No se pudo instalar');return}
+    toast('Instalado: '+i.name);loadMods();
+  }catch(e){busyOff();toast('No se pudo instalar')}
+  finally{modBusy=false}
+}
+async function loadMods(){
+  let list=[];try{list=(await api('mods')).mods||[]}catch(e){}
+  $('mod-list').innerHTML=list.map(m=>`<div class="friend"><div class="av">${esc((m.name||'?')[0].toUpperCase())}</div><div class="nm">${esc(m.name)}<span class="id">${m.count} archivos · ${m.mb} MB · ${esc(m.date||'')}</span></div><button class="btn sm danger" data-id="${m.id}" data-n="${esc(m.name)}">Quitar</button></div>`).join('')||'<div class="note">Ningún mod instalado.</div>';
+}
+$('mod-list').onclick=async e=>{
+  const b=e.target.closest('[data-id]');if(!b)return;
+  if(!confirm(`¿Quitar "${b.dataset.n}"? Sus archivos van a la Papelera de reciclaje.`))return;
+  busyOn('Quitando…');const r=await api('moddel',{id:b.dataset.id});busyOff();
+  toast(r.ok?'Mod quitado':(r.error||'No se pudo quitar'));loadMods();
+};
+$('mod-pick').onclick=()=>$('mod-file').click();
+$('mod-file').onchange=e=>{const f=e.target.files[0];e.target.value='';installMod(f)};
+$('view-mods').addEventListener('dragover',e=>{e.preventDefault();$('view-mods').classList.add('drag')});
+$('view-mods').addEventListener('dragleave',e=>{if(!e.relatedTarget||!$('view-mods').contains(e.relatedTarget))$('view-mods').classList.remove('drag')});
+$('view-mods').addEventListener('drop',e=>{e.preventDefault();$('view-mods').classList.remove('drag');installMod(e.dataTransfer.files[0])});
 
 // ---- comandos rápidos ----
 const WEAPONS=[['Crowbar','weapon_crowbar'],['Pistola 9mm','weapon_9mmhandgun'],['Magnum .357','weapon_357'],['MP5','weapon_9mmAR'],['Escopeta','weapon_shotgun'],
