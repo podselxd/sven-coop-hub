@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.8.0",
+    "date": "2026-11-02",
+    "notes": [
+      "Comandos de chat: /god, /noclip, /notarget, /armas, /give, /restart, /map, /gravedad, /velocidad y /respawn (solo el anfitrión), además de /tp, /card, /kill y /ayuda.",
+      "En Comandos hay una lista de todos con copiar de un clic."
+    ]
+  },
+  {
     "version": "1.7.0",
     "date": "2026-11-02",
     "notes": [

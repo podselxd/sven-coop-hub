@@ -215,6 +215,12 @@ textarea{resize:vertical}
 .linkrow b{font:700 14px Bahnschrift;letter-spacing:.03em;color:var(--hev)}
 .linkrow span{font-size:13px}
 .linkrow em{font-style:normal;color:var(--mute);font-size:11.5px}
+.chatcmds{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.cg h3{margin:0 0 8px;font:700 11px Bahnschrift;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.cc{display:flex;align-items:center;gap:12px;width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:7px 12px;margin-bottom:6px;cursor:pointer;color:var(--text);font:inherit;text-align:left;transition:.12s}
+.cc:hover{border-color:var(--hev)}
+.cc code{font:600 13px Consolas,monospace;color:var(--hev);min-width:140px}
+.cc span{color:var(--mute);font-size:12.5px}
 .hidden{display:none!important}
 .single{grid-column:1/-1;max-width:760px;margin:0 auto;width:100%}
 @media(max-width:900px){main{grid-template-columns:1fr}.rules{grid-template-columns:1fr}}
@@ -317,6 +323,10 @@ textarea{resize:vertical}
   <section class="card" id="bind-card">
     <h2>Comandos rápidos</h2>
     <div class="row"><button class="btn pri hidden" id="bind-btn">Activar atajo F8 y /tp</button><span class="note" id="bind-note"></span></div>
+  </section>
+  <section class="card">
+    <h2>En el chat del juego</h2>
+    <div class="chatcmds" id="chat-cmds"></div>
   </section>
   <div id="cmd-groups" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px"></div>
   <section class="card">
@@ -714,6 +724,13 @@ $('view-mods').addEventListener('dragleave',e=>{if(!e.relatedTarget||!$('view-mo
 $('view-mods').addEventListener('drop',e=>{e.preventDefault();$('view-mods').classList.remove('drag');installMod(e.dataTransfer.files[0])});
 
 // ---- comandos rápidos ----
+const CHAT=[
+  {g:'Para todos',items:[['/tp nombre','Ir con alguien'],['/card','Ver tu tarjeta'],['/s','Guardar posición'],['/p','Volver a ella'],['/kill','Morir'],['/ayuda','Lista de comandos']]},
+  {g:'Solo anfitrión',items:[['/god','Inmortal'],['/noclip','Atravesar paredes'],['/notarget','Monstruos te ignoran'],['/armas','Todas las armas'],['/give escopeta','Dar un arma o item'],['/restart','Reiniciar el mapa'],['/map hl_c05_a1','Cambiar de mapa'],['/gravedad baja','o normal'],['/velocidad rapida','o normal'],['/respawn 5','Segundos de reaparición']]}];
+function renderChat(){
+  $('chat-cmds').innerHTML=CHAT.map(c=>`<div class="cg"><h3>${c.g}</h3>${c.items.map(i=>`<button class="cc" data-c="${esc(i[0])}"><code>${esc(i[0])}</code><span>${esc(i[1])}</span></button>`).join('')}</div>`).join('');
+}
+$('chat-cmds').onclick=e=>{const b=e.target.closest('.cc');if(b)copy(b.dataset.c,'Copiado: '+b.dataset.c)};
 const WEAPONS=[['Crowbar','weapon_crowbar'],['Pistola 9mm','weapon_9mmhandgun'],['Magnum .357','weapon_357'],['MP5','weapon_9mmAR'],['Escopeta','weapon_shotgun'],
  ['Ballesta','weapon_crossbow'],['RPG','weapon_rpg'],['Gauss','weapon_gauss'],['Egon','weapon_egon'],['Hornet','weapon_hornetgun'],
  ['Granadas','weapon_handgrenade'],['Satchel','weapon_satchel'],['Tripmine','weapon_tripmine'],['Snarks','weapon_snark']];
@@ -821,6 +838,7 @@ $('hl-undo').onclick=async()=>{
   renderHealth(r.items);info=await api('state');render();toast('Cambios deshechos');
 };
 function renderCmds(){
+  renderChat();
   $('bind-card').classList.toggle('hidden',!!info.bindReady&&!!info.tpReady);
   $('bind-btn').classList.toggle('hidden',!!info.bindReady&&!!info.tpReady);
   $('tp-note').textContent=info.tpReady?'':'Falta instalar /tp: pulsa "Activar atajo F8 y /tp".';

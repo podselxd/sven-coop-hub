@@ -1,5 +1,5 @@
 {
-    "version":  "1.7.0",
+    "version":  "1.8.0",
     "released":  "2026-11-02",
     "files":  [
                   {
@@ -20,15 +20,15 @@
                   },
                   {
                       "path":  "web/index.html",
-                      "sha256":  "7c18284e2166dfeddb8c85d2861135239a2fa21a00a4c05a98e5b48e724216a3"
+                      "sha256":  "82c5cf28d4de0bd91ff57bc62501b5643462c1c740e7d22afc066ff610d17573"
                   },
                   {
                       "path":  "plugins/HubTP.as",
-                      "sha256":  "e819eced98a2f44371a07b4a7d58f3fc22253358af5abbb51b7c948f70030e74"
+                      "sha256":  "9bab4e961b1bdb2d22e676d13b3bfdf78f29cce6320c51dd7155f61cabf6c4f9"
                   },
                   {
                       "path":  "changelog.json",
-                      "sha256":  "6132534aef4acbafb10e437fa75691cef8e7fa563e7fd1ce2650d4fd8dfb93b9"
+                      "sha256":  "bcc83a68023f75f5d999759c2349d2987f662a676407781407458d753e8c9886"
                   }
               ]
 }
