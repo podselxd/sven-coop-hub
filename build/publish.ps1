@@ -137,6 +137,7 @@ if ($Release) {
     $cl = (Get-Content (Join-Path $Hub 'changelog.json') -Raw -Encoding UTF8 | ConvertFrom-Json) | Where-Object { $_.version -eq $version } | Select-Object -First 1
     $notes = "## Sven Coop Hub v$version`n`n" + (($cl.notes | ForEach-Object { "- $_" }) -join "`n") + "`n`nDescarga **SvenCoopHub.exe** y ejecútalo con Steam abierto (Windows puede avisar: *Más información → Ejecutar de todas formas*). El Hub se actualiza solo."
     $nf = Join-Path ([IO.Path]::GetTempPath()) "hub-notes-$version.md"; [IO.File]::WriteAllText($nf, $notes, $utf8)
+    $ErrorActionPreference = 'Continue'
     & gh release view "v$version" --repo $Repo 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         & gh release upload "v$version" $exe $zip --clobber --repo $Repo 2>&1 | Out-Null
