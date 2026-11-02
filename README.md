@@ -100,4 +100,4 @@ Si haces un fork, genera tus propias llaves y cambia `update.url`: si no, tus Hu
 
 ## Licencia
 
-Aún sin licencia: todos los derechos reservados. Sven Co-op y Half-Life pertenecen a sus respectivos dueños; este proyecto no está afiliado a ellos.
+[MIT](LICENSE). Sven Co-op y Half-Life pertenecen a sus respectivos dueños; este proyecto no está afiliado a ellos.

@@ -68,6 +68,7 @@ if (-not $DocsOnly) {
 Copy-Item (Join-Path $Hub 'README.md') (Join-Path $work 'README.md') -Force
 Copy-Tree (Join-Path $Hub 'docs') (Join-Path $work 'docs')
 Copy-Tree (Join-Path $Hub 'build') (Join-Path $work 'build')
+Copy-Item (Join-Path $Hub 'LICENSE') (Join-Path $work 'LICENSE') -Force
 Copy-Item (Join-Path $Hub 'pubkey.xml') (Join-Path $work 'pubkey.xml') -Force
 Copy-Item (Join-Path $Hub 'update.url') (Join-Path $work 'update.url') -Force
 # la llave publica SI se sube; cualquier llave privada, nunca
