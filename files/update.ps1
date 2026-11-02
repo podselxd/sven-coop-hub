@@ -2,7 +2,7 @@
 # Flujo: manifest.json + manifest.sig (RSA/SHA-256, firmado con la llave privada del autor) -> se verifica con pubkey.xml
 # -> se descargan los archivos -> se comprueba el SHA-256 de cada uno -> se comprueba que hub.ps1/lib.ps1/update.ps1 compilan
 # -> copia de seguridad en prev\ -> se instala. Si la version nueva no llega a arrancar, el siguiente inicio vuelve a la anterior.
-$script:UpdateFiles = 'hub.ps1', 'lib.ps1', 'update.ps1', 'web\index.html', 'plugins\HubTP.as', 'changelog.json'
+$script:UpdateFiles = 'hub.ps1', 'lib.ps1', 'update.ps1', 'overlay.ps1', 'web\index.html', 'plugins\HubTP.as', 'changelog.json'
 
 function Get-Bytes([string]$Url, [int]$TimeoutMs = 4000) {
     $req = [Net.HttpWebRequest]::Create($Url)

@@ -1,22 +1,26 @@
 {
-    "version":  "1.4.1",
+    "version":  "1.5.0",
     "released":  "2026-11-02",
     "files":  [
                   {
                       "path":  "hub.ps1",
-                      "sha256":  "529cb08c5ebcc0f068c5f563fadf94196fd3c91ba0278fc496fb163c384b87e8"
+                      "sha256":  "383431cc36aad058d41ce006adff6381ae78090f22e4cf62c05585840c2858ed"
                   },
                   {
                       "path":  "lib.ps1",
-                      "sha256":  "4f924caa94b06ba9a4f05f919c727b4b25861d0a7f2b00d4bdbcaad6e25fef80"
+                      "sha256":  "f00bb1c741d1451c117d9e59c19e9e5d088322df245486c38ef4cb3a05831b16"
                   },
                   {
                       "path":  "update.ps1",
-                      "sha256":  "470d1c87679246a0746eb3396318f466df1ae0e661a889f62594058e3ff1f0a3"
+                      "sha256":  "fdf45a270dff187cb144f4e4ed1df98d054169051775dd0608496c934868a0ac"
+                  },
+                  {
+                      "path":  "overlay.ps1",
+                      "sha256":  "447e19830f2e392ff3d1562e554341f71da0e4c29f47a90432000da588d7c83c"
                   },
                   {
                       "path":  "web/index.html",
-                      "sha256":  "8d3226ab5900022934e29626b37a0aa839cc3ebac1a6ca481af0eb498948b8d3"
+                      "sha256":  "dc7667b7e52dcb33c9c19cb21178504dd73e9f7a7762246a926e3f4ee2f6a638"
                   },
                   {
                       "path":  "plugins/HubTP.as",
@@ -24,7 +28,7 @@
                   },
                   {
                       "path":  "changelog.json",
-                      "sha256":  "009ccffbe90b02e928c46b64991a30e4d861e9c66d53c5019a1aa3709bf5945c"
+                      "sha256":  "8f137d5cfbdb6aa8dfa9f1a29b225a3537ba47a6be4b79947be8c26b518d90a6"
                   }
               ]
 }

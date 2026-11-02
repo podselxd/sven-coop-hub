@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.5.0",
+    "date": "2026-11-02",
+    "notes": [
+      "Nueva pestaña Reglas: Crear partida queda solo para capítulo e invitación.",
+      "Skins: agregar (.zip o .mdl/.bmp), borrar, ocultar y favoritas.",
+      "Botón flotante opcional dentro del juego (clic o F9 abre Comandos).",
+      "Arranque y miniaturas mucho más rápidos.",
+      "Unirme: amigos guardados con un clic."
+    ]
+  },
+  {
     "version": "1.4.1",
     "date": "2026-11-02",
     "notes": [

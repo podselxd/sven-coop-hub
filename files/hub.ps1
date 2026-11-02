@@ -92,7 +92,7 @@ function Set-AutoLan($game, [bool]$on) {
     Write-Atomic $f $txt
 }
 
-Add-Type -TypeDefinition @"
+$HubWinSource = @"
 using System;
 using System.Runtime.InteropServices;
 public static class HubWin {
@@ -121,6 +121,17 @@ public static class HubWin {
         SetForegroundWindow(h);
         if (fgT != me) AttachThreadInput(me, fgT, false);
     }
+    public static bool IsForeground(IntPtr h) { return GetForegroundWindow() == h; }
+    public static int FocusByTitle(string prefix) {
+        int c = 0;
+        EnumWindows(delegate(IntPtr h, IntPtr l) {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder(256);
+            GetWindowText(h, sb, 256);
+            if (sb.ToString().StartsWith(prefix)) { ForceForeground(h); c++; return false; }
+            return true;
+        }, IntPtr.Zero);
+        return c;
+    }
     public static int MinimizeByTitle(string prefix) {
         int c = 0;
         EnumWindows(delegate(IntPtr h, IntPtr l) {
@@ -133,6 +144,25 @@ public static class HubWin {
     }
 }
 "@
+
+# Compilar C# cuesta ~0,4 s en cada arranque. Se compila una vez a cache\NOMBRE-<huella>.dll y despues solo se carga.
+function Import-Cached([string]$Source, [string]$Name, [string[]]$Refs = @()) {
+    $sha = [BitConverter]::ToString([Security.Cryptography.SHA256]::Create().ComputeHash([Text.Encoding]::UTF8.GetBytes($Source))).Replace('-', '').Substring(0, 10)
+    $dir = Join-Path $Root 'cache'
+    $dll = Join-Path $dir "$Name-$sha.dll"
+    try {
+        if (-not (Test-Path $dll)) {
+            New-Item -ItemType Directory -Force $dir | Out-Null
+            Get-ChildItem $dir -Filter "$Name-*.dll" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+            if ($Refs.Count) { Add-Type -TypeDefinition $Source -OutputAssembly $dll -OutputType Library -ReferencedAssemblies $Refs } else { Add-Type -TypeDefinition $Source -OutputAssembly $dll -OutputType Library }
+        }
+        Add-Type -Path $dll
+    }
+    catch {
+        if ($Refs.Count) { Add-Type -TypeDefinition $Source -ReferencedAssemblies $Refs } else { Add-Type -TypeDefinition $Source }
+    }
+}
+Import-Cached $HubWinSource 'HubWin'
 [HubWin]::SetProcessDPIAware() | Out-Null
 
 # Minimiza la ventana del Hub (la ventana de Edge cuyo titulo es "Sven Coop Hub")
@@ -248,20 +278,34 @@ function Send-GameCmd($game, $lines) {
     $h = $proc.MainWindowHandle
     [HubWin]::keybd_event(0x12, 0, 0, [UIntPtr]::Zero); [HubWin]::keybd_event(0x12, 0, 2, [UIntPtr]::Zero)
     [HubWin]::ForceForeground($h)
-    Start-Sleep -Milliseconds 400
-    [HubWin]::keybd_event(0x77, 0x42, 0, [UIntPtr]::Zero); Start-Sleep -Milliseconds 70
+    $t0 = Get-Date
+    while (-not [HubWin]::IsForeground($h) -and ((Get-Date) - $t0).TotalMilliseconds -lt 1500) { Start-Sleep -Milliseconds 25 }
+    Start-Sleep -Milliseconds 80
+    [HubWin]::keybd_event(0x77, 0x42, 0, [UIntPtr]::Zero); Start-Sleep -Milliseconds 40
     [HubWin]::keybd_event(0x77, 0x42, 2, [UIntPtr]::Zero)
     Log ("cmd $id " + ($clean -join ' | '))
     return $id
 }
 
-function Get-InstalledMaps($game) {
-    $set = @{}
-    foreach ($d in (Get-ChildItem $game -Directory -Filter 'svencoop*' -ErrorAction SilentlyContinue)) {
-        $m = Join-Path $d.FullName 'maps'
-        if (Test-Path $m) { foreach ($b in (Get-ChildItem $m -Filter '*.bsp')) { $set[$b.BaseName] = $true } }
+$script:Page = $null
+$script:PageStamp = 0
+function Get-Page {
+    $f = Join-Path $Web 'index.html'
+    $t = (Get-Item $f).LastWriteTimeUtc.Ticks
+    if ($script:PageStamp -ne $t) {
+        $script:Page = $Utf8.GetBytes((Get-Content $f -Raw -Encoding UTF8).Replace('__TOKEN__', $token))
+        $script:PageStamp = $t
     }
-    @($set.Keys | Sort-Object)
+    return , $script:Page
+}
+
+function Get-InstalledMaps($game) {
+    $set = New-Object 'System.Collections.Generic.HashSet[string]'
+    foreach ($d in [IO.Directory]::GetDirectories($game, 'svencoop*')) {
+        $m = Join-Path $d 'maps'
+        if ([IO.Directory]::Exists($m)) { foreach ($f in [IO.Directory]::GetFiles($m, '*.bsp')) { [void]$set.Add([IO.Path]::GetFileNameWithoutExtension($f)) } }
+    }
+    return @($set | Sort-Object)
 }
 
 function Get-GameProc { Get-Process -Name svencoop -ErrorAction SilentlyContinue | Select-Object -First 1 }
@@ -456,8 +500,11 @@ if (Test-Path $pendingFile) {
     [IO.File]::WriteAllText($pendingFile, "$($pend[0]),1")   # primer arranque de la version nueva
 }
 # auto-actualizacion al abrir (firmada y con respaldo); si no hay internet, sigue con lo que hay
-if (-not $NoUpdate) {
+$checkedFile = Join-Path $Root 'update.checked'
+$checkedRecently = (Test-Path $checkedFile) -and (((Get-Date).ToUniversalTime() - (Get-Item $checkedFile).LastWriteTimeUtc).TotalMinutes -lt 30)
+if (-not $NoUpdate -and -not $checkedRecently) {
     $up = Invoke-SelfUpdate $true
+    if ($up.status -in 'al-dia', 'omitida', 'disabled') { [IO.File]::WriteAllText($checkedFile, '') }
     if ($up.status -eq 'actualizado') {
         # se abre la version nueva y se vigila: si no llega a confirmar su arranque, se vuelve a la anterior
         $child = Start-Process powershell -ArgumentList $hubArgs -PassThru
@@ -489,13 +536,31 @@ $user = Get-SteamUser
 $mapsCache = $null
 $lastPing = Get-Date
 $edgeProc = Open-Window "http://127.0.0.1:$port/?t=$token"
+$script:WantTab = ''
+$headless = $null
+if ((Read-Settings).overlay) { Start-Overlay $port $token }
+# mientras Edge arranca (~1 s) se calientan las cachés: la primera peticion de la pagina ya las encuentra listas
+if ($game) {
+    $mapsCache = Get-InstalledMaps $game
+    [void](Get-ModelInfoCached $game)
+    Start-ThumbWarmer $game
+}
 Log "hub en puerto $port, juego: $game"
 
 try {
     while ($listener.IsListening) {
         $task = $listener.GetContextAsync()
         while (-not $task.Wait(1000)) {
-            if ($edgeProc) { if ($edgeProc.HasExited) { return } }
+            if ($edgeProc) {
+                if ($edgeProc.HasExited) {
+                    # con el boton flotante activo el Hub sigue en segundo plano para poder reabrir la ventana
+                    if (Test-OverlayOn) { $edgeProc = $null; $headless = Get-Date } else { return }
+                }
+            }
+            elseif ($headless) {
+                if (Get-GameProc) { $headless = Get-Date }
+                elseif (((Get-Date) - $headless).TotalMinutes -gt 5) { return }
+            }
             elseif (((Get-Date) - $lastPing).TotalSeconds -gt 180) { return }
         }
         $ctx = $task.Result
@@ -503,30 +568,55 @@ try {
             $path = $ctx.Request.Url.AbsolutePath
             $authed = ($ctx.Request.Headers['X-Hub'] -eq $token)
             if ($path -eq '/' -or $path -eq '/index.html') {
-                $html = (Get-Content (Join-Path $Web 'index.html') -Raw -Encoding UTF8).Replace('__TOKEN__', $token)
-                Send $ctx $html 'text/html; charset=utf-8'
+                Send $ctx (Get-Page) 'text/html; charset=utf-8'
                 continue
             }
             if ($path -eq '/api/modelimg' -and $ctx.Request.QueryString['t'] -eq $token) {
                 $n = "$($ctx.Request.QueryString['n'])"
-                $dirs = Get-PlayerModels $game
-                if ($n -match '^[A-Za-z0-9_\-]+$' -and $dirs.ContainsKey($n)) {
-                    $img = Join-Path $dirs[$n] ($n + '.bmp')
-                    if (Test-Path $img) { Send $ctx ([IO.File]::ReadAllBytes($img)) 'image/bmp'; continue }
+                $mi = @(Get-ModelInfoCached $game | Where-Object { $_.name -eq $n }) | Select-Object -First 1
+                if ((Test-SkinName $n) -and $mi) {
+                    $img = Join-Path $mi.dir ($n + '.bmp')
+                    if (Test-Path $img) { Send $ctx (Get-Thumb $img) 'image/png'; continue }
                 }
                 Send $ctx '{"error":"404"}' 'application/json' 404; continue
             }
             if (-not $authed) { Send $ctx '{"error":"no autorizado"}' 'application/json' 403; continue }
-            if (-not $game -and $path -in '/api/launch', '/api/cmd', '/api/bind', '/api/autolan', '/api/repair', '/api/undo') {
+            if (-not $game -and $path -in '/api/launch', '/api/cmd', '/api/bind', '/api/autolan', '/api/repair', '/api/undo', '/api/skinadd', '/api/skindel') {
                 Send $ctx @{ ok = $false; error = 'No encuentro Sven Co-op. Instalalo desde Steam.' }; continue
             }
             switch ($path) {
-                '/api/ping' { $lastPing = Get-Date; Send $ctx @{ running = [bool](Get-GameProc); steam = [bool](Get-Process steam -ErrorAction SilentlyContinue) } }
+                '/api/ping' {
+                    $lastPing = Get-Date
+                    $wantTab = $script:WantTab; $script:WantTab = ''
+                    Send $ctx @{ running = [bool](Get-GameProc); steam = [bool](Get-Process steam -ErrorAction SilentlyContinue); tab = $wantTab; overlay = (Test-OverlayOn) }
+                }
+                '/api/openhub' {
+                    $p = (Read-Body $ctx) | ConvertFrom-Json
+                    $script:WantTab = "$($p.tab)"
+                    $n = [HubWin]::FocusByTitle('Sven Coop Hub'); Log "openhub tab=$($script:WantTab) ventanas=$n"
+                    if ($n -eq 0 -and -not $NoBrowser) { $edgeProc = Open-Window "http://127.0.0.1:$port/?t=$token"; $headless = $null }
+                    Send $ctx @{ ok = $true }
+                }
+                '/api/overlay' {
+                    $p = (Read-Body $ctx) | ConvertFrom-Json
+                    if ($p.enabled) { Start-Overlay $port $token } else { Stop-Overlay }
+                    Set-Setting 'overlay' ([bool]$p.enabled)
+                    Send $ctx @{ ok = $true; overlay = (Test-OverlayOn) }
+                }
                 '/api/update' {
                     $p = (Read-Body $ctx) | ConvertFrom-Json
                     $res = Invoke-SelfUpdate ([bool]$p.apply)
                     Send $ctx $res
                     if ($res.status -eq 'actualizado') { $script:Relaunch = $true; return }
+                }
+                '/api/skinadd' {
+                    try { $bytes = Read-BodyBytes $ctx; $done = @(Add-SkinZip $game $bytes); Send $ctx @{ ok = $true; installed = $done } }
+                    catch { Send $ctx @{ ok = $false; error = $_.Exception.Message } }
+                }
+                '/api/skindel' {
+                    $p = (Read-Body $ctx) | ConvertFrom-Json
+                    try { Remove-Skin $game "$($p.name)"; Send $ctx @{ ok = $true } }
+                    catch { Send $ctx @{ ok = $false; error = $_.Exception.Message } }
                 }
                 '/api/diag' { Send $ctx @{ text = (Get-Diag $game $user) } }
                 '/api/health' { Send $ctx @{ items = @(Get-Health $game $user) } }
@@ -549,10 +639,11 @@ try {
                         bindReady = [bool]($game -and (Test-Bind $game))
                         tpReady = [bool]($game -and (Test-Tp $game))
                         version = $Version
+                        overlay = (Test-OverlayOn)
                         changelog = @(Get-Changelog)
                         screen = (Get-ScreenSize)
                         player = (Get-PlayerCfg $game)
-                        models = @((Get-PlayerModels $game).Keys | Sort-Object)
+                        models = @(Get-ModelInfoCached $game | ForEach-Object { @{ name = $_.name; custom = $_.custom; img = $_.img } })
                         settings = (Read-Settings)
                     }
                 }
@@ -589,6 +680,7 @@ try {
     }
 }
 finally {
+    Stop-Overlay
     try { $listener.Stop() } catch {}
     Remove-Item $RunFile -ErrorAction SilentlyContinue
     if ($script:Relaunch) { Start-Process powershell -ArgumentList $hubArgs }

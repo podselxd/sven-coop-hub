@@ -34,7 +34,7 @@ nav button.on{background:var(--hev);color:#1a1100}
 .pill{display:flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);padding:5px 11px;border-radius:99px;font-size:12px;color:var(--mute)}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--bad)}
 .dot.ok{background:var(--ok);box-shadow:0 0 8px var(--ok)}
-main{max-width:1240px;margin:0 auto;padding:22px 24px 120px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px}
+main{max-width:1360px;margin:0 auto;padding:22px 28px 120px;align-items:start;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px}
 .card h2{margin:0 0 12px;font-size:15px;color:var(--hev)}
 .card .sub{color:var(--mute);font-size:12.5px;margin-bottom:14px}
@@ -72,12 +72,15 @@ textarea{font-family:Consolas,monospace;font-size:12.5px;resize:vertical;min-hei
 .code .num{font-size:22px;color:var(--hev);letter-spacing:.06em;word-break:break-all}
 .code small{display:block;color:var(--mute);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-family:"Segoe UI"}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
-.slot{aspect-ratio:1/1.05;border-radius:10px;border:1px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--mute);font-size:11px;text-align:center;padding:4px}
-.slot.me{border:1px solid var(--hev);background:#2a1f0c;color:var(--text)}
+.slots{display:flex;margin:12px 0 4px}
+.slot{border-radius:10px;border:1px solid var(--line);display:flex;align-items:center;gap:12px;color:var(--mute);padding:10px 14px;width:100%}
+.slot small{display:block;font-size:11.5px;color:var(--mute)}
+.slot.me{border-color:var(--hev);background:#2a1f0c;color:var(--text)}
 .slot .av{width:34px;height:34px;border-radius:50%;background:var(--hev);color:#1a1100;font:700 16px Bahnschrift;display:grid;place-items:center}
 .friends{display:flex;flex-direction:column;gap:6px;margin-top:10px}
-.friend{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.friend{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.friend .av{width:32px;height:32px;border-radius:50%;background:#2b313b;color:var(--hev);font:700 14px Bahnschrift;display:grid;place-items:center;flex:none}
+.friend .id{display:block;font-weight:400}
 .friend .nm{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .friend .id{font:11px Consolas,monospace;color:var(--mute)}
 .mini{background:none;border:0;color:var(--mute);cursor:pointer;padding:4px 7px;border-radius:6px;font:12px "Segoe UI"}
@@ -147,6 +150,43 @@ code{background:#0a0b0d;padding:1px 6px;border-radius:5px;font:12px Consolas,mon
 #changelog ul{margin:8px 0 2px;padding-left:20px;color:var(--text)}
 #changelog li{margin:3px 0;color:#cfd3da;font-size:13px}
 .hint{color:var(--mute);font:12.5px Consolas,monospace;margin-bottom:12px}
+.joinbar{display:flex;gap:14px;align-items:stretch;margin:12px 0 10px}
+.joinbar .code{flex:1;margin:0;min-width:0}
+.joinbar .go{padding:0 36px}
+.btn.sm{padding:5px 14px;font-size:12px}
+.card{background:linear-gradient(180deg,#171a20,#14171c);box-shadow:0 10px 30px #0003}
+textarea{resize:vertical}
+#view-reglas{grid-template-columns:repeat(auto-fit,minmax(360px,1fr))}
+#view-reglas .rule:last-of-type{border-bottom:0}
+.seg.wide{display:flex;margin:4px 0 8px}.seg.wide button{flex:1;padding:8px 6px}
+.dock .btn{padding:12px 20px}
+#view-skins{grid-template-columns:minmax(0,1fr) 340px}
+.sk-side{position:sticky;top:96px}
+.sk-side .now{display:flex;gap:12px;align-items:center;margin-bottom:4px}
+.sk-side .now img{width:72px;height:72px;object-fit:cover;border-radius:10px;background:#0a0b0d;border:1px solid var(--line)}
+.sk-side small{display:block;color:var(--mute);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.sk-side b{font:700 17px Bahnschrift;letter-spacing:.04em}
+.sk-side label{display:flex;align-items:center;gap:8px;margin-top:14px;color:var(--mute);font-size:12.5px}
+.sk-side label em{margin-left:auto;font:12px Consolas,monospace;color:var(--text);font-style:normal}
+.sk-side input[type=range]{width:100%;margin-top:6px}
+.sk-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.sk-tools input[type=text]{width:190px}
+.chips{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+.chips button{background:var(--panel2);border:1px solid var(--line);color:var(--mute);border-radius:99px;padding:6px 13px;font:600 12px "Segoe UI";cursor:pointer}
+.chips button em{font-style:normal;opacity:.7;margin-left:6px}
+.chips button.on{background:var(--hev);border-color:var(--hev);color:#1a1100}
+.sk{position:relative;display:block}
+.thumb{position:relative;aspect-ratio:1/1;border-radius:7px;overflow:hidden;background:#0a0b0d}
+.thumb .ph{position:absolute;inset:0;display:grid;place-items:center;font:700 36px Bahnschrift;color:#2f3642}
+.sk .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:0}
+.sk .tag{position:absolute;top:12px;left:12px;background:var(--hev);color:#1a1100;font:700 9px Bahnschrift;letter-spacing:.08em;padding:2px 7px;border-radius:99px;font-style:normal}
+.sk .acts{position:absolute;top:12px;right:12px;display:flex;gap:4px;opacity:0;transition:.12s}
+.sk:hover .acts,.sk:focus-within .acts{opacity:1}
+.sk .acts button{background:#0b0c0fd9;border:1px solid #ffffff22;color:#e8eaee;border-radius:7px;width:27px;height:27px;display:grid;place-items:center;cursor:pointer;padding:0}
+.sk .acts button.act-on{color:var(--hev)}
+.sk .acts button.del:hover{color:var(--bad);border-color:var(--bad)}
+.drop{border:1.5px dashed #3a414d;border-radius:10px;padding:18px 12px;text-align:center;color:var(--mute);font-size:12.5px;margin-top:16px;transition:.12s}
+#view-skins.drag .drop{border-color:var(--hev);color:var(--hev);background:#2a1f0c}
 .hidden{display:none!important}
 .single{grid-column:1/-1;max-width:760px;margin:0 auto;width:100%}
 @media(max-width:900px){main{grid-template-columns:1fr}.rules{grid-template-columns:1fr}}
@@ -161,6 +201,7 @@ code{background:#0a0b0d;padding:1px 6px;border-radius:5px;font:12px Consolas,mon
   </div>
   <nav>
     <button id="tab-host" class="on">Crear partida</button>
+    <button id="tab-reglas">Reglas</button>
     <button id="tab-join">Unirme</button>
     <button id="tab-cmds">Comandos</button>
     <button id="tab-skins">Skins</button>
@@ -178,22 +219,6 @@ code{background:#0a0b0d;padding:1px 6px;border-radius:5px;font:12px Consolas,mon
       <h2>Campaña Half-Life</h2>
       <div class="chapters" id="chapters"></div>
     </section>
-    <section class="card">
-      <h2>Reglas de la partida</h2>
-      <div class="rules">
-        <div class="rule"><div><b>Trucos</b></div><label class="sw"><input type="checkbox" id="r-cheats"><i></i></label></div>
-        <div class="rule"><div><b>Modo clásico</b></div><label class="sw"><input type="checkbox" id="r-classic"><i></i></label></div>
-        <div class="rule"><div><b>Reaparición (seg)</b></div><input type="number" id="r-respawn" min="0" max="60"></div>
-        <div class="rule"><div><b>Supervivencia</b></div>
-          <div class="seg" id="r-survival"><button data-v="-1">Mapa</button><button data-v="1">On</button><button data-v="0">Off</button></div></div>
-        <div class="rule"><div><b>Jugadores máx.</b><span><em id="v-max" style="font-style:normal"></em> jugadores</span></div><input type="range" id="r-max" min="2" max="32"></div>
-        <div class="rule"><div><b>Pantalla</b><span id="v-screen">-fullscreen</span></div><div class="seg" id="r-screen"><button data-v="window">Ventana</button><button data-v="full">Completa</button><button data-v="full43">Completa 4:3</button></div></div>
-      </div>
-      <div class="rule" style="border:0;margin-top:6px"><div><b>sv_lan 0 en todo multijugador</b></div><label class="sw"><input type="checkbox" id="r-autolan"><i></i></label></div>
-      <div style="margin-top:6px"><b style="font-weight:600">Comandos extra</b> 
-        <textarea id="r-extra" placeholder="mp_weaponstay 1"></textarea></div>
-      <div class="cmds" id="cmds"></div>
-    </section>
   </div>
 
   <div class="col">
@@ -208,8 +233,6 @@ code{background:#0a0b0d;padding:1px 6px;border-radius:5px;font:12px Consolas,mon
         <button class="btn" id="copy-connect">Solo connect</button>
       </div>
       <div class="slots" id="slots"></div>
-      <label class="rule" style="border:0;padding:0 0 10px"><div><b>Minimizar el Hub al iniciar</b></div><span class="sw"><input type="checkbox" id="r-minimize"><i></i></span></label>
-      <label class="rule" style="border:0;padding:0"><div><b>Copiar invitación al iniciar</b></div><span class="sw"><input type="checkbox" id="r-autocopy"><i></i></span></label>
       <div class="note warn hidden" id="steam-warn">Steam está cerrado: no se puede iniciar. <button class="btn" id="steam-open" style="margin-left:8px;padding:4px 10px">Abrir Steam</button></div>
     </section>
     <section class="card">
@@ -218,20 +241,46 @@ code{background:#0a0b0d;padding:1px 6px;border-radius:5px;font:12px Consolas,mon
       <div class="friends" id="friends"></div>
     </section>
   </div>
-  <div class="dock">
-    <div class="sum"><b id="sum-t">—</b><span id="sum-s"></span></div>
-    <button class="btn bad hidden" id="stop">Cerrar juego</button>
-    <button class="go" id="go-host">Iniciar partida</button>
-  </div>
+</main>
+
+<main id="view-reglas" class="hidden">
+  <section class="card">
+    <h2>Partida</h2>
+    <div class="rule"><div><b>Trucos</b></div><label class="sw"><input type="checkbox" id="r-cheats"><i></i></label></div>
+    <div class="rule"><div><b>Modo clásico</b></div><label class="sw"><input type="checkbox" id="r-classic"><i></i></label></div>
+    <div class="rule"><div><b>Supervivencia</b></div><div class="seg" id="r-survival"><button data-v="-1">Según mapa</button><button data-v="1">On</button><button data-v="0">Off</button></div></div>
+    <div class="rule"><div><b>Reaparición (seg)</b></div><input type="number" id="r-respawn" min="0" max="60"></div>
+    <div class="rule"><div><b>Jugadores máx.</b><span><em id="v-max" style="font-style:normal"></em> jugadores</span></div><input type="range" id="r-max" min="2" max="32"></div>
+  </section>
+  <section class="card">
+    <h2>Pantalla y Hub</h2>
+    <div class="rule"><div><b>Pantalla</b><span id="v-screen"></span></div></div>
+    <div class="seg wide" id="r-screen"><button data-v="window">Ventana</button><button data-v="full">Completa</button><button data-v="full43">Completa 4:3</button></div>
+    <div class="rule"><div><b>Minimizar el Hub al iniciar</b></div><label class="sw"><input type="checkbox" id="r-minimize"><i></i></label></div>
+    <div class="rule"><div><b>Copiar invitación al iniciar</b></div><label class="sw"><input type="checkbox" id="r-autocopy"><i></i></label></div>
+    <div class="rule"><div><b>Botón flotante en el juego</b><span>Clic o F9 abre Comandos · arrástralo · clic derecho lo oculta</span></div><label class="sw"><input type="checkbox" id="r-overlay"><i></i></label></div>
+  </section>
+  <section class="card">
+    <h2>Avanzado</h2>
+    <div class="rule"><div><b>sv_lan 0 en todo multijugador</b></div><label class="sw"><input type="checkbox" id="r-autolan"><i></i></label></div>
+    <div style="margin-top:10px"><b style="font-weight:600">Comandos extra</b>
+      <textarea id="r-extra" placeholder="mp_weaponstay 1" style="margin-top:6px"></textarea></div>
+    <div class="cmds" id="cmds"></div>
+  </section>
 </main>
 
 <main id="view-join" class="hidden">
-  <section class="card single">
+  <section class="card">
     <h2>Unirme a un amigo</h2>
-    <textarea id="j-text" style="min-height:130px" placeholder="sv_cheats 1&#10;mp_respawndelay 5&#10;...&#10;connect STEAM_0:0:508212313"></textarea>
-    <div class="code" style="margin-top:12px"><div style="flex:1"><small>Se conectará a</small><div class="num" id="j-id">—</div></div></div>
-    <div class="row"><button class="go" id="go-join" disabled>Unirme</button><button class="btn" id="j-copy">Copiar connect</button></div>
-    
+    <textarea id="j-text" rows="3" placeholder="Pega la invitación o el STEAM_ID"></textarea>
+    <div class="joinbar">
+      <div class="code"><div style="min-width:0"><small>Se conectará a</small><div class="num" id="j-id">—</div></div></div>
+      <button class="go" id="go-join" disabled>Unirme</button>
+    </div>
+    <div class="row"><button class="btn" id="j-copy">Copiar connect</button></div>
+  </section>
+  <section class="card">
+    <h2>Amigos guardados</h2>
     <div class="friends" id="hosts"></div>
   </section>
 </main>
@@ -258,25 +307,29 @@ code{background:#0a0b0d;padding:1px 6px;border-radius:5px;font:12px Consolas,mon
     <div class="row"><textarea id="free" style="flex:1;min-height:40px" placeholder="changelevel hl_c05_a1"></textarea><button class="btn pri" id="free-go">Enviar</button></div>
   </section>
 </main>
-<main id="view-skins" class="hidden" style="grid-template-columns:1fr">
+<main id="view-skins" class="hidden">
   <section class="card">
-    <div class="row" style="justify-content:space-between;align-items:flex-start">
-      <div><h2>Skin del jugador</h2></div>
-      <input type="text" id="sk-search" placeholder="Buscar modelo…" style="width:240px">
-    </div>
-    <div class="skinbar">
-      <div class="now"><img id="sk-now" alt=""><div><small>Ahora</small><b id="sk-name">—</b></div></div>
-      <div class="cols">
-        <label>Color de arriba <i class="sw-c" id="sk-top-sw"></i><input type="range" id="sk-top" min="0" max="255"><em id="sk-top-v"></em></label>
-        <label>Color de abajo <i class="sw-c" id="sk-bot-sw"></i><input type="range" id="sk-bot" min="0" max="255"><em id="sk-bot-v"></em></label>
-      </div>
-      <button class="btn pri" id="sk-apply">Aplicar colores</button>
+    <div class="sk-tools">
+      <input type="text" id="sk-search" placeholder="Buscar…">
+      <div class="chips" id="sk-filters"></div>
+      <button class="btn pri" id="sk-add">+ Agregar skin</button>
+      <input type="file" id="sk-file" accept=".zip,.mdl,.bmp,.txt" multiple hidden>
     </div>
     <div class="skins" id="skins"></div>
   </section>
+  <aside class="card sk-side">
+    <h2>Ahora</h2>
+    <div class="now"><img id="sk-now" alt=""><div><small>Skin</small><b id="sk-name">—</b></div></div>
+    <label>Color de arriba <i class="sw-c" id="sk-top-sw"></i><em id="sk-top-v"></em></label>
+    <input type="range" id="sk-top" min="0" max="255">
+    <label>Color de abajo <i class="sw-c" id="sk-bot-sw"></i><em id="sk-bot-v"></em></label>
+    <input type="range" id="sk-bot" min="0" max="255">
+    <button class="btn pri" id="sk-apply" style="width:100%;margin-top:16px">Aplicar colores</button>
+    <div class="drop" id="sk-drop">Suelta aquí un .zip<br>o los archivos .mdl y .bmp</div>
+  </aside>
 </main>
-<main id="view-ajustes" class="hidden" style="grid-template-columns:1fr">
-  <section class="card single">
+<main id="view-ajustes" class="hidden">
+  <section class="card">
     <div class="row" style="justify-content:space-between;align-items:flex-start">
       <div><h2>Salud del Hub</h2></div>
       <span class="pill"><span class="dot" id="hl-dot"></span><span id="hl-sum">Revisando…</span></span>
@@ -285,7 +338,7 @@ code{background:#0a0b0d;padding:1px 6px;border-radius:5px;font:12px Consolas,mon
     <div class="row" style="margin-top:14px"><button class="btn pri" id="hl-repair">Reparar todo</button><button class="btn" id="hl-refresh">Volver a revisar</button><button class="btn bad" id="hl-undo">Deshacer cambios en el juego</button></div>
     
   </section>
-  <section class="card single">
+  <section class="card">
     <div class="row" style="justify-content:space-between;align-items:flex-start">
       <div><h2>Sven Coop Hub <span class="vtag" id="ver"></span></h2></div>
       <div class="row"><button class="btn" id="up-check">Buscar actualizaciones</button><button class="btn pri hidden" id="up-apply">Actualizar ahora</button><button class="btn" id="diag-copy">Copiar diagnóstico</button></div>
@@ -295,6 +348,12 @@ code{background:#0a0b0d;padding:1px 6px;border-radius:5px;font:12px Consolas,mon
     <div class="note">Incluye tu nombre de Steam y rutas de tu PC.</div>
   </section>
 </main>
+<div class="dock" id="dock">
+  <div class="sum"><b id="sum-t">—</b><span id="sum-s"></span></div>
+  <button class="btn" id="dock-rules">Reglas</button>
+  <button class="btn bad hidden" id="stop">Cerrar juego</button>
+  <button class="go" id="go-host">Iniciar partida</button>
+</div>
 <div id="loading" class="hidden"><div class="ld-card">
   <div class="spin" id="ld-spin"></div>
   <h2 id="ld-title">Iniciando…</h2>
@@ -315,7 +374,7 @@ const CHAPTERS=[
  ['hl_c07_a1','On A Rail'],['hl_c08_a1','Apprehension'],['hl_c09','Residue Processing'],['hl_c10','Questionable Ethics'],
  ['hl_c11_a1','Surface Tension'],['hl_c12','Forget About Freeman!'],['hl_c13_a1','Lambda Core'],['hl_c14','Xen'],
  ['hl_c15',"Gonarch's Lair"],['hl_c16_a1','Interloper'],['hl_c17','Nihilanth'],['hl_c18','Endgame']];
-const DEF={map:'hl_c00',maxplayers:8,cheats:true,respawn:5,classic:true,survival:-1,screen:'full',minimize:true,logo:'hex',model:'',top:0,bottom:0,extra:'',autoCopy:true,friends:[],hosts:[],lastJoin:''};
+const DEF={map:'hl_c00',maxplayers:8,cheats:true,respawn:5,classic:true,survival:-1,screen:'full',minimize:true,logo:'hex',fav:[],hid:[],overlay:false,model:'',top:0,bottom:0,extra:'',autoCopy:true,friends:[],hosts:[],lastJoin:''};
 let S={...DEF}, info={}, running=false;
 const $=id=>document.getElementById(id);
 async function api(p,body){
@@ -340,7 +399,7 @@ function render(){
   const have=new Set(info.maps||[]);
   $('chapters').innerHTML=CHAPTERS.filter(c=>!info.maps||have.has(c[0])).map((c,i)=>
     `<button class="ch ${c[0]===S.map?'on':''}" data-m="${c[0]}"><div class="n">CAP ${String(CHAPTERS.indexOf(c)).padStart(2,'0')} · ${c[0]}</div><div class="t">${c[1]}</div></button>`).join('');
-  $('r-cheats').checked=S.cheats;$('r-classic').checked=S.classic;$('r-autocopy').checked=S.autoCopy;$('r-minimize').checked=S.minimize!==false;
+  $('r-cheats').checked=S.cheats;$('r-classic').checked=S.classic;$('r-autocopy').checked=S.autoCopy;$('r-minimize').checked=S.minimize!==false;$('r-overlay').checked=!!S.overlay;
   $('r-respawn').value=S.respawn;$('r-max').value=S.maxplayers;$('v-max').textContent=S.maxplayers;$('r-extra').value=S.extra;
   $('r-autolan').checked=!!info.autoLan;
   document.querySelectorAll('#r-screen button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.screen));
@@ -351,7 +410,7 @@ function render(){
   $('cmds').innerHTML=cm.join('\n');
   $('sid').textContent=info.steamId||'No detectado';
   // slots
-  const n=Math.min(S.maxplayers,8);let h=`<div class="slot me"><div class="av">${(info.steamName||'?')[0].toUpperCase()}</div><b>${info.steamName||'Tú'}</b>Anfitrión</div>`;
+  const n=Math.min(S.maxplayers,8);let h=`<div class="slot me"><div class="av">${(info.steamName||'?')[0].toUpperCase()}</div><div><b>${esc(info.steamName||'Tú')}</b><small>Anfitrión · ${S.maxplayers} jugadores máx.</small></div></div>`;
   
   $('slots').innerHTML=h;
   // amigos
@@ -377,7 +436,7 @@ function parseId(t){
 }
 function renderJoin(){
   const id=parseId($('j-text').value);$('j-id').textContent=id||'—';$('go-join').disabled=running||!id||!info.steamRunning;
-  $('hosts').innerHTML=(S.hosts||[]).map((h,i)=>`<div class="friend"><div class="nm">${esc(h.name)}</div><span class="id">${h.id}</span><button class="mini" data-use="${i}">Usar</button><button class="mini" data-delh="${i}">✕</button></div>`).join('');
+  $('hosts').innerHTML=(S.hosts||[]).map((h,i)=>`<div class="friend"><div class="av">${esc((h.name||'?')[0].toUpperCase())}</div><div class="nm">${esc(h.name)}<span class="id">${h.id}</span></div><button class="btn sm pri" data-use="${i}">Unirme</button><button class="mini" data-delh="${i}">✕</button></div>`).join('')||'<div class="note">Se guardan al unirte.</div>';
 }
 
 // eventos
@@ -388,6 +447,7 @@ $('r-max').oninput=e=>{S.maxplayers=+e.target.value;save();$('v-max').textConten
 $('r-extra').oninput=e=>{S.extra=e.target.value;save();$('cmds').innerHTML=['<span class="c">// se ejecutan al abrir el mapa</span>',...rulesLines(),...S.extra.split(/\r?\n/).filter(s=>s.trim())].join('\n')};
 $('r-screen').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.screen=b.dataset.v;save();render()};
 $('r-survival').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.survival=+b.dataset.v;save();render()};
+$('r-overlay').onchange=async e=>{S.overlay=e.target.checked;save();const r=await api('overlay',{enabled:S.overlay});toast(r.overlay?'Botón flotante activado':'Botón flotante desactivado')};
 $('r-autolan').onchange=async e=>{const r=await api('autolan',{enabled:e.target.checked});info.autoLan=r.autoLan;toast(r.autoLan?'sv_lan 0 se aplicará en todo multijugador':'Quitado de listenserver.cfg')};
 $('copy-id').onclick=()=>copy(info.steamId,'Código copiado');
 $('copy-invite').onclick=()=>copy(invite(),'Invitación copiada, pégala en Discord');
@@ -413,32 +473,118 @@ $('go-join').onclick=async()=>{
   if(!r.ok)toast(r.error||'No se pudo iniciar');else{setRunning(true);showLoading('Entrando a la partida')}
 };
 $('hosts').onclick=e=>{const b=e.target.closest('button');if(!b)return;
-  if(b.dataset.use!==undefined){$('j-text').value='connect '+S.hosts[b.dataset.use].id;renderJoin()}
+  if(b.dataset.use!==undefined){$('j-text').value='connect '+S.hosts[b.dataset.use].id;S.lastJoin=$('j-text').value;save();renderJoin();if(!$('go-join').disabled)$('go-join').click()}
   if(b.dataset.delh!==undefined){S.hosts.splice(b.dataset.delh,1);save();renderJoin()}};
 function tab(t){
-  for(const v of ['host','join','cmds','skins','ajustes']){$('view-'+v).classList.toggle('hidden',t!==v);$('tab-'+v).classList.toggle('on',t===v)}
+  for(const v of ['host','reglas','join','cmds','skins','ajustes']){$('view-'+v).classList.toggle('hidden',t!==v);$('tab-'+v).classList.toggle('on',t===v)}
+  $('dock').classList.toggle('hidden',t!=='host'&&t!=='reglas');
   if(t==='cmds')renderCmds();
   if(t==='skins')renderSkins();
   if(t==='ajustes'){loadHealth();renderAbout();checkUpdate()}
 }
-$('tab-host').onclick=()=>tab('host');$('tab-join').onclick=()=>tab('join');$('tab-cmds').onclick=()=>tab('cmds');$('tab-skins').onclick=()=>tab('skins');$('tab-ajustes').onclick=()=>tab('ajustes');
+$('tab-host').onclick=()=>tab('host');$('tab-join').onclick=()=>tab('join');$('tab-reglas').onclick=()=>tab('reglas');$('dock-rules').onclick=()=>tab('reglas');$('tab-cmds').onclick=()=>tab('cmds');$('tab-skins').onclick=()=>tab('skins');$('tab-ajustes').onclick=()=>tab('ajustes');
 
 // ---- skins ----
 const hue=v=>`hsl(${Math.round(v/255*360)} 85% 50%)`;
 const mimg=n=>`/api/modelimg?t=${TOKEN}&n=${encodeURIComponent(n)}`;
 function curModel(){return S.model||(info.player&&info.player.model)||''}
+const IC={
+  star:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>',
+  starOn:'<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>',
+  hide:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 6.1A9.6 9.6 0 0112 6c5 0 8.5 4 9.5 6a12 12 0 01-2.6 3.4M6.6 6.7C4.4 8.1 3 10.2 2.5 12c1 2 4.5 6 9.5 6 1.5 0 2.9-.4 4.1-1M9.9 9.9a3 3 0 004.2 4.2"/></svg>',
+  show:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12C3.5 10 7 6 12 6s8.5 4 9.5 6c-1 2-4.5 6-9.5 6s-8.5-4-9.5-6z"/><circle cx="12" cy="12" r="3"/></svg>',
+  del:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12h10l1-12M9 7V4h6v3"/></svg>'
+};
+let skFilter='all';
+const inL=(a,n)=>(a||[]).some(x=>x.toLowerCase()===n.toLowerCase());
+const toggleL=(k,n)=>{S[k]=S[k]||[];const i=S[k].findIndex(x=>x.toLowerCase()===n.toLowerCase());if(i>=0)S[k].splice(i,1);else S[k].push(n)};
+function skinCard(m,cur){
+  const fav=inL(S.fav,m.name),hid=inL(S.hid,m.name);
+  return `<div class="sk ${m.name.toLowerCase()===cur.toLowerCase()?'on':''}" data-m="${esc(m.name)}">
+    <div class="thumb"><div class="ph">${esc(m.name[0].toUpperCase())}</div>${m.img?`<img loading="lazy" src="${mimg(m.name)}" alt="" onerror="this.remove()">`:''}</div>
+    ${m.custom?'<i class="tag">MÍA</i>':''}
+    <span>${esc(m.name)}</span>
+    <div class="acts">
+      <button data-a="fav" class="${fav?'act-on':''}" title="${fav?'Quitar de favoritas':'Favorita'}">${fav?IC.starOn:IC.star}</button>
+      <button data-a="hide" title="${hid?'Mostrar':'Ocultar'}">${hid?IC.show:IC.hide}</button>
+      ${m.custom?`<button data-a="del" class="del" title="Eliminar">${IC.del}</button>`:''}
+    </div></div>`;
+}
 function renderSkins(){
-  const cur=curModel(),q=$('sk-search').value.trim().toLowerCase();
+  const cur=curModel(),q=$('sk-search').value.trim().toLowerCase(),all=info.models||[];
   if(S.model===''&&info.player){S.top=S.top||info.player.top;S.bottom=S.bottom||info.player.bottom}
   $('sk-name').textContent=cur||'—';$('sk-now').src=cur?mimg(cur):'';
   $('sk-top').value=S.top;$('sk-bot').value=S.bottom;$('sk-top-v').textContent=S.top;$('sk-bot-v').textContent=S.bottom;
   $('sk-top-sw').style.background=hue(S.top);$('sk-bot-sw').style.background=hue(S.bottom);
-  $('skins').innerHTML=(info.models||[]).filter(m=>m.toLowerCase().includes(q)).map(m=>`<button class="sk ${m.toLowerCase()===cur.toLowerCase()?'on':''}" data-m="${esc(m)}"><img loading="lazy" src="${mimg(m)}" alt=""><span>${esc(m)}</span></button>`).join('')||'<div class="note">Sin resultados.</div>';
+  const vis=m=>!inL(S.hid,m.name);
+  const cnt={all:all.filter(vis).length,fav:all.filter(m=>vis(m)&&inL(S.fav,m.name)).length,mine:all.filter(m=>vis(m)&&m.custom).length,hid:all.filter(m=>!vis(m)).length};
+  $('sk-filters').innerHTML=[['all','Todas'],['fav','Favoritas'],['mine','Mías'],['hid','Ocultas']].map(([k,l])=>`<button data-f="${k}" class="${skFilter===k?'on':''}">${l}<em>${cnt[k]}</em></button>`).join('');
+  const shown=all.filter(m=>skFilter==='hid'?!vis(m):vis(m)&&(skFilter==='fav'?inL(S.fav,m.name):skFilter==='mine'?m.custom:true))
+    .filter(m=>m.name.toLowerCase().includes(q)).sort((a,b)=>inL(S.fav,b.name)-inL(S.fav,a.name));
+  $('skins').innerHTML=shown.map(m=>skinCard(m,cur)).join('')||'<div class="note">Nada por aquí.</div>';
 }
 $('sk-search').oninput=renderSkins;
-$('skins').onclick=e=>{const b=e.target.closest('.sk');if(!b)return;S.model=b.dataset.m;save();renderSkins();if(running)sendCmd(['model '+S.model],'Skin '+S.model);else toast('Skin '+S.model)};
-for(const [id,k] of [['sk-top','top'],['sk-bot','bottom']])$(id).oninput=e=>{S[k]=+e.target.value;if(k==='top'&&!S.model)S.model=curModel();if(k==='bottom'&&!S.model)S.model=curModel();save();renderSkins()};
+$('sk-filters').onclick=e=>{const b=e.target.closest('button');if(!b)return;skFilter=b.dataset.f;renderSkins()};
+$('skins').onclick=async e=>{
+  const c=e.target.closest('.sk');if(!c)return;const name=c.dataset.m,a=e.target.closest('[data-a]');
+  if(a){
+    if(a.dataset.a==='fav')toggleL('fav',name);
+    else if(a.dataset.a==='hide')toggleL('hid',name);
+    else if(a.dataset.a==='del'){
+      if(!confirm('¿Eliminar la skin '+name+'? Va a la Papelera de reciclaje.'))return;
+      const r=await api('skindel',{name});if(!r.ok){toast(r.error||'No se pudo eliminar');return}
+      info=await api('state');toast('Skin eliminada');
+    }
+    save();renderSkins();return;
+  }
+  S.model=name;save();renderSkins();if(running)sendCmd(['model '+name],'Skin '+name);else toast('Skin '+name);
+};
+for(const [id,k] of [['sk-top','top'],['sk-bot','bottom']])$(id).oninput=e=>{S[k]=+e.target.value;if(!S.model)S.model=curModel();save();renderSkins()};
 $('sk-apply').onclick=()=>{if(running)sendCmd(['topcolor '+S.top,'bottomcolor '+S.bottom],'Colores');else toast('Colores guardados')};
+
+// agregar: .zip tal cual, o archivos sueltos empaquetados en un zip (sin compresion) en el navegador
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=u=>{let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRC[(c^u[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0};
+async function makeZip(files,folder){
+  const enc=new TextEncoder(),parts=[],cen=[];let off=0;
+  for(const f of files){
+    const data=new Uint8Array(await f.arrayBuffer()),name=enc.encode(folder+'/'+f.name),crc=crc32(data);
+    const lh=new DataView(new ArrayBuffer(30));lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(6,0x0800,true);lh.setUint16(12,0x21,true);lh.setUint32(14,crc,true);lh.setUint32(18,data.length,true);lh.setUint32(22,data.length,true);lh.setUint16(26,name.length,true);
+    parts.push(new Uint8Array(lh.buffer),name,data);
+    const ch=new DataView(new ArrayBuffer(46));ch.setUint32(0,0x02014b50,true);ch.setUint16(4,20,true);ch.setUint16(6,20,true);ch.setUint16(8,0x0800,true);ch.setUint16(14,0x21,true);ch.setUint32(16,crc,true);ch.setUint32(20,data.length,true);ch.setUint32(24,data.length,true);ch.setUint16(28,name.length,true);ch.setUint32(42,off,true);
+    cen.push(new Uint8Array(ch.buffer),name);
+    off+=30+name.length+data.length;
+  }
+  const cd=cen.reduce((a,b)=>a+b.length,0),end=new DataView(new ArrayBuffer(22));
+  end.setUint32(0,0x06054b50,true);end.setUint16(8,files.length,true);end.setUint16(10,files.length,true);end.setUint32(12,cd,true);end.setUint32(16,off,true);
+  return new Blob([...parts,...cen,new Uint8Array(end.buffer)],{type:'application/zip'});
+}
+async function addSkins(list){
+  const files=[...list];if(!files.length)return;
+  const jobs=files.filter(f=>/\.zip$/i.test(f.name));
+  const loose=files.filter(f=>/\.(mdl|bmp|txt)$/i.test(f.name));
+  if(loose.length){
+    const stems=loose.filter(f=>/\.mdl$/i.test(f.name)).map(f=>f.name.replace(/\.mdl$/i,''));
+    const main=stems.filter(x=>!(/t$/i.test(x)&&stems.some(o=>o.toLowerCase()===x.slice(0,-1).toLowerCase())));
+    if(main.length!==1){toast('Elige los archivos de una sola skin (.mdl y .bmp)');if(!jobs.length)return}
+    else{const base=main[0].toLowerCase();jobs.push(await makeZip(loose.filter(f=>{const b=f.name.replace(/\.[^.]+$/,'').toLowerCase();return b===base||b===base+'t'}),main[0]))}
+  }
+  if(!jobs.length){toast('Usa un .zip o los archivos .mdl y .bmp');return}
+  $('busy-t').textContent='Agregando skin…';$('busy').classList.remove('hidden');
+  const added=[];let err='';
+  try{for(const j of jobs){const r=await(await fetch('/api/skinadd',{method:'POST',headers:{'X-Hub':TOKEN},body:j})).json();if(r.ok)added.push(...r.installed);else err=r.error}}
+  catch(e){err='El Hub no responde'}
+  finally{$('busy').classList.add('hidden')}
+  info=await api('state');if(added.length)skFilter='mine';renderSkins();
+  toast(added.length?'Agregada: '+added.join(', ')+(err?' · '+err:''):err||'No se agregó nada');
+}
+$('sk-add').onclick=()=>$('sk-file').click();
+$('sk-file').onchange=e=>{addSkins(e.target.files);e.target.value=''};
+window.addEventListener('dragover',e=>e.preventDefault());
+window.addEventListener('drop',e=>e.preventDefault());
+$('view-skins').addEventListener('dragover',e=>{e.preventDefault();$('view-skins').classList.add('drag')});
+$('view-skins').addEventListener('dragleave',e=>{if(!e.relatedTarget||!$('view-skins').contains(e.relatedTarget))$('view-skins').classList.remove('drag')});
+$('view-skins').addEventListener('drop',e=>{e.preventDefault();$('view-skins').classList.remove('drag');addSkins(e.dataTransfer.files)});
 
 // ---- comandos rápidos ----
 const WEAPONS=[['Crowbar','weapon_crowbar'],['Pistola 9mm','weapon_9mmhandgun'],['Magnum .357','weapon_357'],['MP5','weapon_9mmAR'],['Escopeta','weapon_shotgun'],
@@ -473,7 +619,7 @@ async function sendCmd(cmds,label){
     const r=await api('cmd',{cmds});
     if(!r.ok){toast(r.error||'No se pudo enviar');return}
     let ok=false;const t0=Date.now();
-    while(Date.now()-t0<12000){await sleep(500);try{if((await api('cmdstatus?id='+r.id)).done){ok=true;break}}catch(e){}}
+    while(Date.now()-t0<12000){await sleep(250);try{if((await api('cmdstatus?id='+r.id)).done){ok=true;break}}catch(e){}}
     toast(ok?(label||'Comando')+' aplicado ✓':(label||'Comando')+' enviado');
   }catch(e){toast('El Hub no responde')}
   finally{$('busy').classList.add('hidden')}
@@ -496,7 +642,7 @@ async function pollLoading(){
   if(r.error){$('ld-spin').classList.add('hidden');$('ld-title').textContent='No se pudo terminar';$('ld-err').textContent=r.error;$('ld-err').classList.remove('hidden');$('ld-close').classList.remove('hidden');setRunning(false);return}
   if(r.done){$('ld-spin').classList.add('hidden');$('ld-title').textContent='¡Todo listo!';$('ld-sub').textContent='';$('ld-bar').style.width='100%';setRunning(true);loadT=setTimeout(hideLoading,1300);return}
   if(r.elapsed>90){$('ld-sub').textContent='Está tardando más de lo normal. Puedes ocultar esta pantalla.';$('ld-close').classList.remove('hidden')}
-  loadT=setTimeout(pollLoading,700);
+  loadT=setTimeout(pollLoading,450);
 }
 $('ld-close').onclick=hideLoading;
 $('steam-open').onclick=async()=>{await api('steam',{});toast('Abriendo Steam…')};
@@ -548,6 +694,7 @@ $('hl-undo').onclick=async()=>{
   renderHealth(r.items);info=await api('state');render();toast('Cambios deshechos');
 };
 function renderCmds(){
+  $('bind-card').classList.toggle('hidden',!!info.bindReady&&!!info.tpReady);
   $('bind-btn').classList.toggle('hidden',!!info.bindReady&&!!info.tpReady);
   $('tp-note').textContent=info.tpReady?'':'Falta instalar /tp: pulsa "Activar atajo F8 y /tp".';
   $('bind-note').textContent=info.bindReady?'':'Falta el atajo F8.';
@@ -601,7 +748,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('.logo'))$('logo-pop'
   running=info.running;render();
   if(!info.gamePath)toast('No encontré Sven Co-op');
   else api('health').then(h=>{const bad=(h.items||[]).filter(i=>i.level==='bad'&&i.id!=='steam').length;if(bad)toast('Hay problemas: abre Ajustes')}).catch(()=>{});
-  setInterval(async()=>{try{const r=await api('ping');const sc=r.steam!==info.steamRunning;info.steamRunning=r.steam;if(sc){$('d-steam').classList.toggle('ok',!!r.steam);$('t-steam').textContent=r.steam?'Steam conectado':'Steam cerrado';$('steam-warn').classList.toggle('hidden',!!r.steam)}if(r.running!==running||sc)setRunning(r.running)}catch(e){}},4000);
+  setInterval(async()=>{try{const r=await api('ping');if(r.tab)tab(r.tab);if(S.overlay&&r.overlay===false){S.overlay=false;$('r-overlay').checked=false}const sc=r.steam!==info.steamRunning;info.steamRunning=r.steam;if(sc){$('d-steam').classList.toggle('ok',!!r.steam);$('t-steam').textContent=r.steam?'Steam conectado':'Steam cerrado';$('steam-warn').classList.toggle('hidden',!!r.steam)}if(r.running!==running||sc)setRunning(r.running)}catch(e){}},4000);
 })();
 </script>
 </body>
