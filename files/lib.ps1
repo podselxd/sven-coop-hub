@@ -40,20 +40,20 @@ function New-Check($id, $level, $label, $detail) { @{ id = $id; level = $level; 
 function Get-Health($game, $user) {
     $items = @()
     if ($game) { $items += New-Check 'game' 'ok' 'Sven Co-op encontrado' $game }
-    else { return @(New-Check 'game' 'bad' 'No encuentro Sven Co-op' 'Instala el juego desde Steam y vuelve a abrir el Hub.') }
+    else { return @(New-Check 'game' 'bad' 'No encuentro Sven Co-op' 'Instálalo desde Steam.') }
     if (Get-Process -Name steam -ErrorAction SilentlyContinue) { $items += New-Check 'steam' 'ok' 'Steam abierto' '' }
-    else { $items += New-Check 'steam' 'bad' 'Steam esta cerrado' 'Abre Steam para poder jugar.' }
+    else { $items += New-Check 'steam' 'bad' 'Steam esta cerrado' '' }
     if ($user) { $items += New-Check 'user' 'ok' "Cuenta detectada: $($user.name)" $user.steamId }
-    else { $items += New-Check 'user' 'warn' 'No detecte tu cuenta de Steam' 'Inicia sesion en Steam.' }
+    else { $items += New-Check 'user' 'warn' 'No detecte tu cuenta de Steam' '' }
     if (Test-Bind $game) { $items += New-Check 'bind' 'ok' 'Atajo F8 para comandos' 'userconfig.cfg' }
-    else { $items += New-Check 'bind' 'bad' 'Falta el atajo F8' 'Sin el, la pestana Comandos no puede mandar nada. Pulsa Reparar todo.' }
+    else { $items += New-Check 'bind' 'bad' 'Falta el atajo F8' '' }
     if (Test-Tp $game) { $items += New-Check 'plugin' 'ok' 'Plugin /tp instalado' 'HubTP.as' }
-    else { $items += New-Check 'plugin' 'bad' 'Falta el plugin /tp' 'Pulsa Reparar todo.' }
+    else { $items += New-Check 'plugin' 'bad' 'Falta el plugin /tp' '' }
     $errs = @(Get-PluginErrors $game)
-    if ($errs.Count -eq 0) { $items += New-Check 'compile' 'ok' 'El plugin /tp carga sin errores' 'Segun el log de AngelScript' }
+    if ($errs.Count -eq 0) { $items += New-Check 'compile' 'ok' 'El plugin /tp carga sin errores' '' }
     else { $items += New-Check 'compile' 'bad' 'El plugin /tp tiene errores de compilacion' $errs[0] }
     if (Test-AutoLan $game) { $items += New-Check 'lan' 'ok' 'sv_lan 0 automatico en todo multijugador' 'listenserver.cfg' }
-    else { $items += New-Check 'lan' 'warn' 'sv_lan 0 automatico desactivado' 'Actívalo en Crear partida > Reglas si quieres.' }
+    else { $items += New-Check 'lan' 'warn' 'sv_lan 0 automatico desactivado' '' }
     return $items
 }
 

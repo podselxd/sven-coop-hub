@@ -1,11 +1,17 @@
 [
   {
+    "version": "1.4.1",
+    "date": "2026-11-02",
+    "notes": [
+      "Interfaz más limpia: menos texto, solo avisos cuando algo falta.",
+      "Quité los huecos \"Libre\" de la sala (no se podían detectar jugadores)."
+    ]
+  },
+  {
     "version": "1.4.0",
     "date": "2026-11-02",
     "notes": [
-      "Auto-actualización: el Hub busca versiones nuevas al abrirse y se actualiza solo.",
-      "Cada actualización va firmada: sin firma válida y sin que coincida el hash de cada archivo, no se instala nada.",
-      "Si una versión nueva no llega a arrancar, el Hub vuelve solo a la anterior.",
+      "Auto-actualización firmada, con vuelta atrás si algo falla.",
       "Botón Buscar actualizaciones en Ajustes."
     ]
   },
@@ -13,38 +19,35 @@
     "version": "1.3.0",
     "date": "2026-11-02",
     "notes": [
-      "Poka-yoke: no deja iniciar con Steam cerrado, con un mapa que no existe ni con un STEAM_ID inválido.",
-      "Nueva pestaña Ajustes con chequeo de salud, Reparar todo y Deshacer cambios.",
-      "Los archivos del juego se escriben de forma atómica, con copia de seguridad.",
-      "Versión visible, novedades y diagnóstico para copiar."
+      "No deja iniciar con Steam cerrado, mapa inexistente o STEAM_ID inválido.",
+      "Ajustes: salud, Reparar todo, Deshacer cambios, diagnóstico."
     ]
   },
   {
     "version": "1.2.0",
     "date": "2026-11-02",
     "notes": [
-      "Pantalla de carga que avanza con lo que el juego confirma (mapa, trucos, respawn, supervivencia, clásico).",
-      "Cuatro logos originales con selector e icono propio.",
-      "El Hub se minimiza solo al iniciar y el juego toma el foco."
+      "Pantalla de carga con progreso real.",
+      "Cuatro logos con selector e icono propio.",
+      "El Hub se minimiza solo y el juego toma el foco."
     ]
   },
   {
     "version": "1.1.0",
     "date": "2026-11-02",
     "notes": [
-      "Pestaña Comandos: reiniciar, dar, quitar, trucos, mundo, atajos propios y consola libre.",
-      "/tp nombre para ir con un jugador, /s y /p para guardar y volver a una posición.",
-      "Pestaña Skins con miniaturas y colores.",
-      "Pantalla completa, también 4:3 con barras negras."
+      "Pestañas Comandos y Skins.",
+      "/tp, /s y /p.",
+      "Pantalla completa, también 4:3."
     ]
   },
   {
     "version": "1.0.0",
     "date": "2026-11-02",
     "notes": [
-      "Launcher para la campaña de Half-Life con tus comandos (sv_cheats, mp_respawndelay, modo clásico, supervivencia, sv_lan 0).",
-      "Sala de invitación con tu código de Steam y pestaña Unirme.",
-      "sv_lan 0 automático en todo multijugador."
+      "Launcher de la campaña de Half-Life con tus comandos.",
+      "Sala de invitación y pestaña Unirme.",
+      "sv_lan 0 automático."
     ]
   }
 ]

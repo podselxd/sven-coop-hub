@@ -36,7 +36,7 @@ nav button.on{background:var(--hev);color:#1a1100}
 .dot.ok{background:var(--ok);box-shadow:0 0 8px var(--ok)}
 main{max-width:1240px;margin:0 auto;padding:22px 24px 120px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px}
-.card h2{margin:0 0 4px;font-size:15px;color:var(--hev)}
+.card h2{margin:0 0 12px;font-size:15px;color:var(--hev)}
 .card .sub{color:var(--mute);font-size:12.5px;margin-bottom:14px}
 .col{display:flex;flex-direction:column;gap:20px}
 .chapters{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px}
@@ -146,6 +146,7 @@ code{background:#0a0b0d;padding:1px 6px;border-radius:5px;font:12px Consolas,mon
 #changelog summary em{font-style:normal;color:var(--mute);font-weight:400;margin-left:8px;font-size:12px}
 #changelog ul{margin:8px 0 2px;padding-left:20px;color:var(--text)}
 #changelog li{margin:3px 0;color:#cfd3da;font-size:13px}
+.hint{color:var(--mute);font:12.5px Consolas,monospace;margin-bottom:12px}
 .hidden{display:none!important}
 .single{grid-column:1/-1;max-width:760px;margin:0 auto;width:100%}
 @media(max-width:900px){main{grid-template-columns:1fr}.rules{grid-template-columns:1fr}}
@@ -175,23 +176,21 @@ code{background:#0a0b0d;padding:1px 6px;border-radius:5px;font:12px Consolas,mon
   <div class="col">
     <section class="card">
       <h2>Campaña Half-Life</h2>
-      <div class="sub">Elige desde qué capítulo arrancan. Solo está la campaña original de HL.</div>
       <div class="chapters" id="chapters"></div>
     </section>
     <section class="card">
       <h2>Reglas de la partida</h2>
-      <div class="sub">Se aplican solas al abrir el mapa, igual que escribirlas en consola.</div>
       <div class="rules">
-        <div class="rule"><div><b>Trucos</b><span>sv_cheats</span></div><label class="sw"><input type="checkbox" id="r-cheats"><i></i></label></div>
-        <div class="rule"><div><b>Modo clásico</b><span>toggle_classic_mode</span></div><label class="sw"><input type="checkbox" id="r-classic"><i></i></label></div>
-        <div class="rule"><div><b>Reaparición (seg)</b><span>mp_respawndelay</span></div><input type="number" id="r-respawn" min="0" max="60"></div>
-        <div class="rule"><div><b>Supervivencia</b><span>toggle_survival_mode</span></div>
+        <div class="rule"><div><b>Trucos</b></div><label class="sw"><input type="checkbox" id="r-cheats"><i></i></label></div>
+        <div class="rule"><div><b>Modo clásico</b></div><label class="sw"><input type="checkbox" id="r-classic"><i></i></label></div>
+        <div class="rule"><div><b>Reaparición (seg)</b></div><input type="number" id="r-respawn" min="0" max="60"></div>
+        <div class="rule"><div><b>Supervivencia</b></div>
           <div class="seg" id="r-survival"><button data-v="-1">Mapa</button><button data-v="1">On</button><button data-v="0">Off</button></div></div>
-        <div class="rule"><div><b>Jugadores máx.</b><span>maxplayers · <em id="v-max" style="font-style:normal"></em></span></div><input type="range" id="r-max" min="2" max="32"></div>
+        <div class="rule"><div><b>Jugadores máx.</b><span><em id="v-max" style="font-style:normal"></em> jugadores</span></div><input type="range" id="r-max" min="2" max="32"></div>
         <div class="rule"><div><b>Pantalla</b><span id="v-screen">-fullscreen</span></div><div class="seg" id="r-screen"><button data-v="window">Ventana</button><button data-v="full">Completa</button><button data-v="full43">Completa 4:3</button></div></div>
       </div>
-      <div class="rule" style="border:0;margin-top:6px"><div><b>sv_lan 0 en todo multijugador</b><span>se guarda en listenserver.cfg: aplica cada vez que abran un multijugador, incluso sin el Hub</span></div><label class="sw"><input type="checkbox" id="r-autolan"><i></i></label></div>
-      <div style="margin-top:6px"><b style="font-weight:600">Comandos extra</b> <span style="color:var(--mute);font-size:12px">(uno por línea, se ejecutan al final)</span>
+      <div class="rule" style="border:0;margin-top:6px"><div><b>sv_lan 0 en todo multijugador</b></div><label class="sw"><input type="checkbox" id="r-autolan"><i></i></label></div>
+      <div style="margin-top:6px"><b style="font-weight:600">Comandos extra</b> 
         <textarea id="r-extra" placeholder="mp_weaponstay 1"></textarea></div>
       <div class="cmds" id="cmds"></div>
     </section>
@@ -200,7 +199,6 @@ code{background:#0a0b0d;padding:1px 6px;border-radius:5px;font:12px Consolas,mon
   <div class="col">
     <section class="card">
       <h2>Sala de invitación</h2>
-      <div class="sub">Tus amigos se conectan con este código desde la consola de Sven Co-op o con la pestaña “Unirme”.</div>
       <div class="code">
         <div style="flex:1;min-width:0"><small>Tu código</small><div class="num" id="sid">—</div></div>
         <button class="btn" id="copy-id">Copiar</button>
@@ -210,13 +208,12 @@ code{background:#0a0b0d;padding:1px 6px;border-radius:5px;font:12px Consolas,mon
         <button class="btn" id="copy-connect">Solo connect</button>
       </div>
       <div class="slots" id="slots"></div>
-      <label class="rule" style="border:0;padding:0 0 10px"><div><b>Minimizar el Hub al iniciar</b><span>el juego toma el mouse y el foco</span></div><span class="sw"><input type="checkbox" id="r-minimize"><i></i></span></label>
-      <label class="rule" style="border:0;padding:0"><div><b>Copiar invitación al iniciar</b><span>lista para pegar en Discord</span></div><span class="sw"><input type="checkbox" id="r-autocopy"><i></i></span></label>
+      <label class="rule" style="border:0;padding:0 0 10px"><div><b>Minimizar el Hub al iniciar</b></div><span class="sw"><input type="checkbox" id="r-minimize"><i></i></span></label>
+      <label class="rule" style="border:0;padding:0"><div><b>Copiar invitación al iniciar</b></div><span class="sw"><input type="checkbox" id="r-autocopy"><i></i></span></label>
       <div class="note warn hidden" id="steam-warn">Steam está cerrado: no se puede iniciar. <button class="btn" id="steam-open" style="margin-left:8px;padding:4px 10px">Abrir Steam</button></div>
     </section>
     <section class="card">
       <h2>Amigos</h2>
-      <div class="sub">Guárdalos una vez y copia su invitación con un clic.</div>
       <div class="row"><input type="text" id="f-name" placeholder="Nombre" style="flex:1"><button class="btn" id="f-add">Agregar</button></div>
       <div class="friends" id="friends"></div>
     </section>
@@ -231,44 +228,40 @@ code{background:#0a0b0d;padding:1px 6px;border-radius:5px;font:12px Consolas,mon
 <main id="view-join" class="hidden">
   <section class="card single">
     <h2>Unirme a un amigo</h2>
-    <div class="sub">Pega la invitación que te mandó (o solo el código STEAM_0:X:XXXX) y entra directo.</div>
     <textarea id="j-text" style="min-height:130px" placeholder="sv_cheats 1&#10;mp_respawndelay 5&#10;...&#10;connect STEAM_0:0:508212313"></textarea>
     <div class="code" style="margin-top:12px"><div style="flex:1"><small>Se conectará a</small><div class="num" id="j-id">—</div></div></div>
     <div class="row"><button class="go" id="go-join" disabled>Unirme</button><button class="btn" id="j-copy">Copiar connect</button></div>
-    <div class="note">Si el juego abre pero no conecta, pega el connect en la consola (tecla ~).</div>
+    
     <div class="friends" id="hosts"></div>
   </section>
 </main>
 <main id="view-cmds" class="hidden" style="grid-template-columns:1fr">
   <section class="card" id="bind-card">
     <h2>Comandos rápidos</h2>
-    <div class="sub">Se mandan al juego abierto con la tecla F8 (el Hub trae el juego al frente y la pulsa por ti). Solo funcionan como anfitrión; los de trucos necesitan <code>sv_cheats 1</code>.</div>
     <div class="row"><button class="btn pri hidden" id="bind-btn">Activar atajo F8 y /tp</button><span class="note" id="bind-note"></span></div>
   </section>
   <div id="cmd-groups" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px"></div>
   <section class="card">
     <h2>Teletransporte</h2>
-    <div class="sub">Dentro del juego escribe en el chat <code>/tp nombre</code> (nombre parcial vale), <code>/tp</code> para ver la lista, <code>/s</code> guarda tu posición y <code>/p</code> vuelve a ella. Aplica a cualquiera de la sala. Se carga al abrir un mapa nuevo.</div>
+    <div class="hint">/tp nombre · /tp lista · /s guardar · /p volver</div>
     <div class="row"><input type="text" id="tp-name" placeholder="Nombre del jugador" style="width:220px"><button class="btn pri" id="tp-go">Ir con él (/tp)</button>
       <button class="btn" id="tp-list">Ver lista</button><button class="btn" id="tp-save">Guardar posición (/s)</button><button class="btn" id="tp-load">Ir a posición (/p)</button></div>
     <div class="note" id="tp-note"></div>
   </section>
   <section class="card">
     <h2>Mis atajos</h2>
-    <div class="sub">Guarda tus propios comandos (por ejemplo tu tp). Varios comandos separados por salto de línea.</div>
     <div class="row"><input type="text" id="sc-name" placeholder="Nombre" style="width:180px"><textarea id="sc-cmds" placeholder="comando" style="flex:1;min-height:40px"></textarea><button class="btn" id="sc-add">Guardar</button></div>
     <div class="cbtns" id="sc-list" style="margin-top:12px"></div>
   </section>
   <section class="card">
     <h2>Consola libre</h2>
-    <div class="sub">Lo que escribas aquí se ejecuta tal cual en el juego.</div>
     <div class="row"><textarea id="free" style="flex:1;min-height:40px" placeholder="changelevel hl_c05_a1"></textarea><button class="btn pri" id="free-go">Enviar</button></div>
   </section>
 </main>
 <main id="view-skins" class="hidden" style="grid-template-columns:1fr">
   <section class="card">
     <div class="row" style="justify-content:space-between;align-items:flex-start">
-      <div><h2>Skin del jugador</h2><div class="sub">Clic en un modelo para ponértelo al instante en la partida abierta (usa F8). Queda guardado para la próxima.</div></div>
+      <div><h2>Skin del jugador</h2></div>
       <input type="text" id="sk-search" placeholder="Buscar modelo…" style="width:240px">
     </div>
     <div class="skinbar">
@@ -285,27 +278,27 @@ code{background:#0a0b0d;padding:1px 6px;border-radius:5px;font:12px Consolas,mon
 <main id="view-ajustes" class="hidden" style="grid-template-columns:1fr">
   <section class="card single">
     <div class="row" style="justify-content:space-between;align-items:flex-start">
-      <div><h2>Salud del Hub</h2><div class="sub">El Hub revisa solo que todo lo que necesita esté en su sitio, y lo arregla con un clic.</div></div>
+      <div><h2>Salud del Hub</h2></div>
       <span class="pill"><span class="dot" id="hl-dot"></span><span id="hl-sum">Revisando…</span></span>
     </div>
     <ul class="health" id="hl-list"></ul>
     <div class="row" style="margin-top:14px"><button class="btn pri" id="hl-repair">Reparar todo</button><button class="btn" id="hl-refresh">Volver a revisar</button><button class="btn bad" id="hl-undo">Deshacer cambios en el juego</button></div>
-    <div class="note">Deshacer quita el atajo F8, el plugin /tp y el sv_lan automático, y restaura default_plugins.txt. Tus partidas y tu configuración de Sven no se tocan.</div>
+    
   </section>
   <section class="card single">
     <div class="row" style="justify-content:space-between;align-items:flex-start">
-      <div><h2>Sven Coop Hub <span class="vtag" id="ver"></span></h2><div class="sub">Qué ha mejorado en cada versión.</div></div>
+      <div><h2>Sven Coop Hub <span class="vtag" id="ver"></span></h2></div>
       <div class="row"><button class="btn" id="up-check">Buscar actualizaciones</button><button class="btn pri hidden" id="up-apply">Actualizar ahora</button><button class="btn" id="diag-copy">Copiar diagnóstico</button></div>
     </div>
     <div class="note" id="up-status" style="margin:-4px 0 8px"></div>
     <div id="changelog"></div>
-    <div class="note">El diagnóstico incluye tu nombre de Steam y rutas de tu PC: revísalo antes de compartirlo. Si algo falla, pégamelo y lo arreglo.</div>
+    <div class="note">Incluye tu nombre de Steam y rutas de tu PC.</div>
   </section>
 </main>
 <div id="loading" class="hidden"><div class="ld-card">
   <div class="spin" id="ld-spin"></div>
   <h2 id="ld-title">Iniciando…</h2>
-  <div class="sub2" id="ld-sub">No toques nada: se están aplicando tus reglas y comandos.</div>
+  <div class="sub2" id="ld-sub"></div>
   <div class="bar"><b id="ld-bar"></b></div>
   <ul id="ld-steps"></ul>
   <div id="ld-err" class="hidden"></div>
@@ -359,7 +352,7 @@ function render(){
   $('sid').textContent=info.steamId||'No detectado';
   // slots
   const n=Math.min(S.maxplayers,8);let h=`<div class="slot me"><div class="av">${(info.steamName||'?')[0].toUpperCase()}</div><b>${info.steamName||'Tú'}</b>Anfitrión</div>`;
-  for(let i=1;i<n;i++)h+=`<div class="slot">Libre</div>`;
+  
   $('slots').innerHTML=h;
   // amigos
   $('friends').innerHTML=S.friends.length?S.friends.map((f,i)=>`<div class="friend"><div class="nm">${esc(f)}</div><button class="mini" data-inv="${i}">Copiar invitación</button><button class="mini" data-del="${i}">✕</button></div>`).join(''):'<div class="note">Aún no hay amigos guardados.</div>';
@@ -405,11 +398,11 @@ $('friends').onclick=e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.inv!==undefined)copy(`Oye ${S.friends[b.dataset.inv]}, entra:\n`+invite(),'Invitación copiada');
   if(b.dataset.del!==undefined){S.friends.splice(b.dataset.del,1);save();render()}};
 $('go-host').onclick=async()=>{
-  if(S.autoCopy)await copy(invite(),'Invitación copiada · iniciando…');else toast('Iniciando…');
+  if(S.autoCopy)await copy(invite(),'Invitación copiada');else toast('Iniciando…');
   const r=await api('launch',{mode:'host',...S,minimize:S.minimize!==false,model:S.model||undefined,topcolor:S.model?S.top:undefined,bottomcolor:S.model?S.bottom:undefined});
   if(!r.ok)toast(r.error||'No se pudo iniciar');else{setRunning(true);showLoading('Iniciando partida')}
 };
-$('stop').onclick=async()=>{if(!confirm('¿Cerrar Sven Co-op? Se pierde el progreso de la partida actual.'))return;await api('stop',{});setRunning(false);toast('Juego cerrado')};
+$('stop').onclick=async()=>{if(!confirm('¿Cerrar Sven Co-op?'))return;await api('stop',{});setRunning(false);toast('Juego cerrado')};
 $('j-text').oninput=()=>{S.lastJoin=$('j-text').value;save();renderJoin()};
 $('j-copy').onclick=()=>{const id=parseId($('j-text').value);if(id)copy('connect '+id,'Comando copiado')};
 $('go-join').onclick=async()=>{
@@ -443,9 +436,9 @@ function renderSkins(){
   $('skins').innerHTML=(info.models||[]).filter(m=>m.toLowerCase().includes(q)).map(m=>`<button class="sk ${m.toLowerCase()===cur.toLowerCase()?'on':''}" data-m="${esc(m)}"><img loading="lazy" src="${mimg(m)}" alt=""><span>${esc(m)}</span></button>`).join('')||'<div class="note">Sin resultados.</div>';
 }
 $('sk-search').oninput=renderSkins;
-$('skins').onclick=e=>{const b=e.target.closest('.sk');if(!b)return;S.model=b.dataset.m;save();renderSkins();if(running)sendCmd(['model '+S.model],'Skin '+S.model);else toast('Skin '+S.model+' (se aplica al iniciar)')};
+$('skins').onclick=e=>{const b=e.target.closest('.sk');if(!b)return;S.model=b.dataset.m;save();renderSkins();if(running)sendCmd(['model '+S.model],'Skin '+S.model);else toast('Skin '+S.model)};
 for(const [id,k] of [['sk-top','top'],['sk-bot','bottom']])$(id).oninput=e=>{S[k]=+e.target.value;if(k==='top'&&!S.model)S.model=curModel();if(k==='bottom'&&!S.model)S.model=curModel();save();renderSkins()};
-$('sk-apply').onclick=()=>{if(running)sendCmd(['topcolor '+S.top,'bottomcolor '+S.bottom],'Colores');else toast('Colores guardados (se aplican al iniciar)')};
+$('sk-apply').onclick=()=>{if(running)sendCmd(['topcolor '+S.top,'bottomcolor '+S.bottom],'Colores');else toast('Colores guardados')};
 
 // ---- comandos rápidos ----
 const WEAPONS=[['Crowbar','weapon_crowbar'],['Pistola 9mm','weapon_9mmhandgun'],['Magnum .357','weapon_357'],['MP5','weapon_9mmAR'],['Escopeta','weapon_shotgun'],
@@ -481,7 +474,7 @@ async function sendCmd(cmds,label){
     if(!r.ok){toast(r.error||'No se pudo enviar');return}
     let ok=false;const t0=Date.now();
     while(Date.now()-t0<12000){await sleep(500);try{if((await api('cmdstatus?id='+r.id)).done){ok=true;break}}catch(e){}}
-    toast(ok?(label||'Comando')+' aplicado ✓':(label||'Comando')+' enviado (sin confirmación del juego)');
+    toast(ok?(label||'Comando')+' aplicado ✓':(label||'Comando')+' enviado');
   }catch(e){toast('El Hub no responde')}
   finally{$('busy').classList.add('hidden')}
 }
@@ -489,7 +482,7 @@ async function sendCmd(cmds,label){
 let loadT;
 function hideLoading(){clearTimeout(loadT);$('loading').classList.add('hidden')}
 function showLoading(title){
-  $('ld-title').textContent=title;$('ld-sub').textContent='No toques nada: se están aplicando tus reglas y comandos.';
+  $('ld-title').textContent=title;$('ld-sub').textContent='';
   $('ld-steps').innerHTML='';$('ld-err').classList.add('hidden');$('ld-close').classList.add('hidden');
   $('ld-spin').classList.remove('hidden');$('ld-bar').style.width='4%';$('loading').classList.remove('hidden');pollLoading();
 }
@@ -501,7 +494,7 @@ async function pollLoading(){
   $('ld-steps').innerHTML=st.map((x,i)=>`<li class="${x.done?'ok':i===cur?'cur':''}"><i></i>${x.label}</li>`).join('');
   $('ld-bar').style.width=Math.max(4,Math.round(n/Math.max(st.length,1)*100))+'%';
   if(r.error){$('ld-spin').classList.add('hidden');$('ld-title').textContent='No se pudo terminar';$('ld-err').textContent=r.error;$('ld-err').classList.remove('hidden');$('ld-close').classList.remove('hidden');setRunning(false);return}
-  if(r.done){$('ld-spin').classList.add('hidden');$('ld-title').textContent='¡Todo listo!';$('ld-sub').textContent='El juego toma el control.';$('ld-bar').style.width='100%';setRunning(true);loadT=setTimeout(hideLoading,1300);return}
+  if(r.done){$('ld-spin').classList.add('hidden');$('ld-title').textContent='¡Todo listo!';$('ld-sub').textContent='';$('ld-bar').style.width='100%';setRunning(true);loadT=setTimeout(hideLoading,1300);return}
   if(r.elapsed>90){$('ld-sub').textContent='Está tardando más de lo normal. Puedes ocultar esta pantalla.';$('ld-close').classList.remove('hidden')}
   loadT=setTimeout(pollLoading,700);
 }
@@ -514,7 +507,7 @@ function renderAbout(){
   $('logo-btn').title='Sven Coop Hub v'+(info.version||'?')+' · clic para cambiar el logo';
   $('changelog').innerHTML=(info.changelog||[]).map((c,i)=>`<details ${i===0?'open':''}><summary>v${esc(c.version)}<em>${esc(c.date||'')}</em></summary><ul>${(c.notes||[]).map(n=>`<li>${esc(n)}</li>`).join('')}</ul></details>`).join('')||'<div class="note">Sin novedades registradas.</div>';
 }
-const UP_MSG={'al-dia':()=>'Estás al día ✓','disponible':r=>`Hay una versión nueva: v${r.latest}`,'disabled':()=>'Las actualizaciones no están configuradas en esta copia.','error':()=>'No pude comprobar las actualizaciones (¿sin internet?).','firma-invalida':()=>'Actualización rechazada: la firma no es válida. No se instaló nada.','omitida':r=>`La v${r.latest} falló en este PC y se omite.`};
+const UP_MSG={'al-dia':()=>'Estás al día ✓','disponible':r=>`Hay una versión nueva: v${r.latest}`,'disabled':()=>'Actualizaciones desactivadas','error':()=>'No pude comprobar (¿sin internet?)','firma-invalida':()=>'Firma inválida: no se instaló nada','omitida':r=>`La v${r.latest} falló aquí y se omite`};
 async function checkUpdate(){
   $('up-status').textContent='Buscando actualizaciones…';$('up-apply').classList.add('hidden');
   try{
@@ -526,16 +519,16 @@ async function checkUpdate(){
 }
 $('up-check').onclick=checkUpdate;
 $('up-apply').onclick=async()=>{
-  $('up-apply').disabled=true;$('up-status').textContent='Descargando y verificando la firma…';
+  $('up-apply').disabled=true;$('up-status').textContent='Actualizando…';
   try{
     const r=await api('update',{apply:true});
-    if(r.status==='actualizado'){$('up-status').textContent=`Actualizado a v${r.latest}. El Hub se reabre solo.`;toast('Actualizado a v'+r.latest);setTimeout(()=>window.close(),2500)}
+    if(r.status==='actualizado'){$('up-status').textContent=`Actualizado a v${r.latest}`;toast('Actualizado a v'+r.latest);setTimeout(()=>window.close(),2500)}
     else{$('up-status').textContent=r.error?('No se instaló: '+r.error):(UP_MSG[r.status]||(()=>r.status))(r);$('up-apply').disabled=false}
   }catch(e){$('up-status').textContent='Se está reiniciando el Hub…';setTimeout(()=>window.close(),2500)}
 };
 $('diag-copy').onclick=async()=>{try{const r=await api('diag');await copy(r.text,'Diagnóstico copiado')}catch(e){toast('No pude generar el diagnóstico')}};
 function renderHealth(items){
-  $('hl-list').innerHTML=items.map(i=>`<li class="${i.level}"><i></i><div><b>${esc(i.label)}</b><span>${esc(i.detail||'')}</span></div></li>`).join('');
+  $('hl-list').innerHTML=items.map(i=>`<li class="${i.level}"><i></i><div><b>${esc(i.label)}</b><span>${i.level==='ok'?'':esc(i.detail||'')}</span></div></li>`).join('');
   const bad=items.filter(i=>i.level==='bad').length,warn=items.filter(i=>i.level==='warn').length;
   $('hl-dot').className='dot'+(bad?'':' ok');
   $('hl-sum').textContent=bad?`${bad} problema${bad>1?'s':''}: pulsa Reparar todo`:warn?'Todo en orden (con avisos)':'Todo en orden';
@@ -549,16 +542,16 @@ $('hl-repair').onclick=async()=>{
   const bad=renderHealth(r.items);info=await api('state');toast(bad?'Reparado en parte: revisa lo que sigue en rojo':'Todo reparado ✓');
 };
 $('hl-undo').onclick=async()=>{
-  if(!confirm('¿Quitar del juego todo lo que instaló el Hub (atajo F8, plugin /tp, sv_lan automático)?'))return;
+  if(!confirm('¿Quitar del juego lo que instaló el Hub?'))return;
   const r=await api('undo',{});
   if(!r.ok){toast(r.error||'No se pudo deshacer');return}
   renderHealth(r.items);info=await api('state');render();toast('Cambios deshechos');
 };
 function renderCmds(){
   $('bind-btn').classList.toggle('hidden',!!info.bindReady&&!!info.tpReady);
-  $('tp-note').textContent=info.tpReady?'/tp instalado. Si el juego ya estaba abierto, cambia de mapa o reinícialo desde el Hub para que cargue.':'Pulsa "Activar atajo F8 y /tp" arriba para instalarlo.';
-  $('bind-note').textContent=info.bindReady?'Atajo F8 activo. Si el juego ya estaba abierto antes de activarlo, escribe exec userconfig.cfg en su consola una vez.':'Primero activa el atajo F8.';
-  $('cmd-groups').innerHTML=GROUPS.map((g,gi)=>`<section class="card"><h2>${g.t}</h2><div class="sub">${g.s}</div><div class="cbtns">`+
+  $('tp-note').textContent=info.tpReady?'':'Falta instalar /tp: pulsa "Activar atajo F8 y /tp".';
+  $('bind-note').textContent=info.bindReady?'':'Falta el atajo F8.';
+  $('cmd-groups').innerHTML=GROUPS.map((g,gi)=>`<section class="card"><h2>${g.t}</h2><div class="cbtns">`+
     g.items.map((it,i)=>`<button class="btn ${it.d?'danger':''}" data-g="${gi}" data-i="${i}">${it.l}</button>`).join('')+
     (g.extra==='chapter'?`<select id="go-ch">${CHAPTERS.map(c=>`<option value="${c[0]}">${c[1]}</option>`).join('')}</select><button class="btn" id="go-ch-btn">Ir al capítulo</button>`:'')+
     `</div></section>`).join('');
@@ -607,7 +600,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('.logo'))$('logo-pop'
   $('j-text').value=S.lastJoin||'';
   running=info.running;render();
   if(!info.gamePath)toast('No encontré Sven Co-op');
-  else api('health').then(h=>{const bad=(h.items||[]).filter(i=>i.level==='bad'&&i.id!=='steam').length;if(bad)toast('Detecté '+bad+' problema(s): abre Ajustes y pulsa Reparar todo')}).catch(()=>{});
+  else api('health').then(h=>{const bad=(h.items||[]).filter(i=>i.level==='bad'&&i.id!=='steam').length;if(bad)toast('Hay problemas: abre Ajustes')}).catch(()=>{});
   setInterval(async()=>{try{const r=await api('ping');const sc=r.steam!==info.steamRunning;info.steamRunning=r.steam;if(sc){$('d-steam').classList.toggle('ok',!!r.steam);$('t-steam').textContent=r.steam?'Steam conectado':'Steam cerrado';$('steam-warn').classList.toggle('hidden',!!r.steam)}if(r.running!==running||sc)setRunning(r.running)}catch(e){}},4000);
 })();
 </script>
