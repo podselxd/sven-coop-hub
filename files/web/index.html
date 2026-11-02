@@ -200,6 +200,21 @@ textarea{resize:vertical}
 .site em{font-style:normal;color:var(--mute);font-size:11.5px;margin-top:4px}
 .drop.big{padding:34px 14px;font-size:14px;margin-top:0}
 #view-mods.drag .drop{border-color:var(--hev);color:var(--hev);background:#2a1f0c}
+.joinrow{display:flex;gap:10px;align-items:stretch}
+.joinrow textarea{flex:1;min-height:46px;height:46px;max-height:120px;resize:none;font:13px Consolas,monospace;padding:12px 14px;line-height:1.3}
+.go.sm{font-size:15px;padding:0 28px;border-radius:9px;box-shadow:none;letter-spacing:.08em}
+.idline{display:flex;align-items:center;gap:10px;margin-top:10px;font:600 13px Consolas,monospace;color:var(--mute)}
+.idline.ok{color:var(--hev)}
+.idline .mini{margin-left:auto}
+.friend .av.lock{color:var(--hev)}
+.okmark{color:var(--ok);font-weight:700;padding:0 6px}
+.links{display:flex;flex-direction:column;gap:8px}
+.linkrow{display:flex;align-items:center;gap:14px;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:12px 16px;transition:.12s}
+.linkrow:hover{border-color:#3b4250}
+.linkrow .nm{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.linkrow b{font:700 14px Bahnschrift;letter-spacing:.03em;color:var(--hev)}
+.linkrow span{font-size:13px}
+.linkrow em{font-style:normal;color:var(--mute);font-size:11.5px}
 .hidden{display:none!important}
 .single{grid-column:1/-1;max-width:760px;margin:0 auto;width:100%}
 @media(max-width:900px){main{grid-template-columns:1fr}.rules{grid-template-columns:1fr}}
@@ -287,12 +302,11 @@ textarea{resize:vertical}
 <main id="view-join" class="hidden">
   <section class="card">
     <h2>Unirme a un amigo</h2>
-    <textarea id="j-text" rows="3" placeholder="Pega la invitación o el STEAM_ID"></textarea>
-    <div class="joinbar">
-      <div class="code"><div style="min-width:0"><small>Se conectará a</small><div class="num" id="j-id">—</div></div></div>
-      <button class="go" id="go-join" disabled>Unirme</button>
+    <div class="joinrow">
+      <textarea id="j-text" rows="1" placeholder="Pega la invitación o el STEAM_ID"></textarea>
+      <button class="go sm" id="go-join" disabled>Unirme</button>
     </div>
-    <div class="row"><button class="btn" id="j-copy">Copiar connect</button></div>
+    <div class="idline" id="j-idline"><span id="j-id">Sin código</span><button class="mini" id="j-copy">Copiar connect</button></div>
   </section>
   <section class="card">
     <h2>Amigos guardados</h2>
@@ -346,13 +360,15 @@ textarea{resize:vertical}
 </main>
 <main id="view-mods" class="hidden">
   <section class="card">
-    <h2>Descargar</h2>
-    <div class="sites" id="mod-sites"></div>
+    <div class="sk-tools"><h2 style="margin:0">Descargar</h2><div class="chips" id="mod-cats"></div></div>
+    <div class="links" id="mod-sites"></div>
   </section>
   <aside class="card">
     <h2>Instalar</h2>
     <div class="drop big" id="mod-drop">Suelta aquí el .zip<div style="margin-top:12px"><button class="btn pri" id="mod-pick">Elegir .zip</button></div></div>
     <input type="file" id="mod-file" accept=".zip" hidden>
+    <h2 style="margin-top:22px">Esenciales</h2>
+    <div class="friends" id="mod-ess"></div>
     <h2 style="margin-top:22px">Instalados</h2>
     <div class="friends" id="mod-list"></div>
   </aside>
@@ -464,7 +480,7 @@ function parseId(t){
   return '';
 }
 function renderJoin(){
-  const id=parseId($('j-text').value);$('j-id').textContent=id||'—';$('go-join').disabled=running||!id||!info.steamRunning;
+  const id=parseId($('j-text').value);$('j-id').textContent=id||'Sin código';$('j-idline').classList.toggle('ok',!!id);const jt=$('j-text');jt.style.height='46px';jt.style.height=Math.min(jt.scrollHeight,120)+'px';$('go-join').disabled=running||!id||!info.steamRunning;
   $('hosts').innerHTML=(S.hosts||[]).map((h,i)=>`<div class="friend"><div class="av">${esc((h.name||'?')[0].toUpperCase())}</div><div class="nm">${esc(h.name)}<span class="id">${h.id}</span></div><button class="btn sm pri" data-use="${i}">Unirme</button><button class="mini" data-delh="${i}">✕</button></div>`).join('')||'<div class="note">Se guardan al unirte.</div>';
 }
 
@@ -524,6 +540,7 @@ const IC={
   starOn:'<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>',
   hide:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 6.1A9.6 9.6 0 0112 6c5 0 8.5 4 9.5 6a12 12 0 01-2.6 3.4M6.6 6.7C4.4 8.1 3 10.2 2.5 12c1 2 4.5 6 9.5 6 1.5 0 2.9-.4 4.1-1M9.9 9.9a3 3 0 004.2 4.2"/></svg>',
   show:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12C3.5 10 7 6 12 6s8.5 4 9.5 6c-1 2-4.5 6-9.5 6s-8.5-4-9.5-6z"/><circle cx="12" cy="12" r="3"/></svg>',
+  lock:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>',
   del:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12h10l1-12M9 7V4h6v3"/></svg>'
 };
 let skFilter='all';
@@ -537,7 +554,7 @@ function skinCard(m,cur){
     <span>${esc(m.name)}</span>
     <div class="acts">
       <button data-a="fav" class="${fav?'act-on':''}" title="${fav?'Quitar de favoritas':'Favorita'}">${fav?IC.starOn:IC.star}</button>
-      <button data-a="hide" title="${hid?'Mostrar':'Ocultar'}">${hid?IC.show:IC.hide}</button>
+      ${m.custom?`<button data-a="hide" title="${hid?'Mostrar':'Ocultar'}">${hid?IC.show:IC.hide}</button>`:''}
       ${m.custom?`<button data-a="del" class="del" title="Eliminar">${IC.del}</button>`:''}
     </div></div>`;
 }
@@ -547,14 +564,14 @@ function renderSkins(){
   $('sk-name').textContent=cur||'—';$('sk-now').src=cur?mimg(cur):'';
   $('sk-top').value=S.top;$('sk-bot').value=S.bottom;$('sk-top-v').textContent=S.top;$('sk-bot-v').textContent=S.bottom;
   $('sk-top-sw').style.background=hue(S.top);$('sk-bot-sw').style.background=hue(S.bottom);
-  const vis=m=>!inL(S.hid,m.name);
-  const cnt={all:all.filter(vis).length,fav:all.filter(m=>vis(m)&&inL(S.fav,m.name)).length,mine:all.filter(m=>vis(m)&&m.custom).length,hid:all.filter(m=>!vis(m)).length};
-  $('sk-filters').innerHTML=[['all','Todas'],['fav','Favoritas'],['mine','Mías'],['hid','Ocultas']].map(([k,l])=>`<button data-f="${k}" class="${skFilter===k?'on':''}">${l}<em>${cnt[k]}</em></button>`).join('');
-  const shown=all.filter(m=>skFilter==='hid'?!vis(m):vis(m)&&(skFilter==='fav'?inL(S.fav,m.name):skFilter==='mine'?m.custom:true))
+  const vis=m=>!(m.custom&&inL(S.hid,m.name));
+  const cnt={all:all.filter(m=>vis(m)&&m.custom).length,fav:all.filter(m=>vis(m)&&inL(S.fav,m.name)).length,game:all.filter(m=>!m.custom).length,hid:all.filter(m=>!vis(m)).length};
+  $('sk-filters').innerHTML=[['all','Mis skins'],['fav','Favoritas'],['game','Del juego'],['hid','Ocultas']].map(([k,l])=>`<button data-f="${k}" class="${skFilter===k?'on':''}">${l}<em>${cnt[k]}</em></button>`).join('');
+  const shown=all.filter(m=>skFilter==='hid'?!vis(m):skFilter==='game'?!m.custom:vis(m)&&(skFilter==='fav'?inL(S.fav,m.name):m.custom))
     .filter(m=>m.name.toLowerCase().includes(q)).sort((a,b)=>inL(S.fav,b.name)-inL(S.fav,a.name));
-  $('skins').innerHTML=shown.map(m=>skinCard(m,cur)).join('')||'<div class="note">Nada por aquí.</div>';
+  $('skins').innerHTML=shown.map(m=>skinCard(m,cur)).join('')||(skFilter==='all'&&cnt.game?'<div class="note">Las skins del juego están ocultas: míralas en «Del juego».</div>':'<div class="note">Nada por aquí.</div>');
   const cm=all.find(m=>m.name.toLowerCase()===cur.toLowerCase());
-  $('sk-cur').innerHTML=cm?`<button class="btn sm" data-a="fav" data-m="${esc(cm.name)}">${inL(S.fav,cm.name)?IC.starOn:IC.star} Favorita</button><button class="btn sm" data-a="hide" data-m="${esc(cm.name)}">${IC.hide} Ocultar</button>${cm.custom?`<button class="btn sm danger" data-a="del" data-m="${esc(cm.name)}">${IC.del} Eliminar</button>`:''}`:'';
+  $('sk-cur').innerHTML=cm?`<button class="btn sm" data-a="fav" data-m="${esc(cm.name)}">${inL(S.fav,cm.name)?IC.starOn:IC.star} Favorita</button>${cm.custom?`<button class="btn sm" data-a="hide" data-m="${esc(cm.name)}">${IC.hide} Ocultar</button>`:''}${cm.custom?`<button class="btn sm danger" data-a="del" data-m="${esc(cm.name)}">${IC.del} Eliminar</button>`:''}`:'';
 }
 $('sk-search').oninput=renderSkins;
 $('sk-filters').onclick=e=>{const b=e.target.closest('button');if(!b)return;skFilter=b.dataset.f;renderSkins()};
@@ -610,7 +627,7 @@ async function addSkins(list){
   try{for(const j of jobs){const r=await(await fetch('/api/skinadd',{method:'POST',headers:{'X-Hub':TOKEN},body:j})).json();if(r.ok)added.push(...r.installed);else err=r.error}}
   catch(e){err='El Hub no responde'}
   finally{$('busy').classList.add('hidden')}
-  info=await api('state');if(added.length)skFilter='mine';renderSkins();
+  info=await api('state');if(added.length)skFilter='all';renderSkins();
   toast(added.length?'Agregada: '+added.join(', ')+(err?' · '+err:''):err||'No se agregó nada');
 }
 $('sk-add').onclick=()=>$('sk-file').click();
@@ -622,18 +639,32 @@ $('view-skins').addEventListener('dragleave',e=>{if(!e.relatedTarget||!$('view-s
 $('view-skins').addEventListener('drop',e=>{e.preventDefault();$('view-skins').classList.remove('drag');addSkins(e.dataTransfer.files)});
 
 // ---- mods ----
-const SITES=[
-  {t:'Skins',d:'Sven Co-op Model Database',u:'https://wootguy.github.io/pmodels/sc/',h:'wootguy.github.io'},
-  {t:'Mapas y campañas',d:'SCMapDB',u:'http://scmapdb.wikidot.com/',h:'scmapdb.wikidot.com'},
-  {t:'Mods, sonidos y scripts',d:'GameBanana',u:'https://gamebanana.com/games/54',h:'gamebanana.com'},
-  {t:'Addons y modelos',d:'ModDB',u:'https://www.moddb.com/games/sven-co-op',h:'moddb.com'},
-  {t:'Oficial',d:'svencoop.com · archivos y noticias',u:'https://svencoop.com/',h:'svencoop.com'},
-  {t:'Wiki',d:'Guías y documentación',u:'https://wiki.svencoop.com/',h:'wiki.svencoop.com'},
-  {t:'Comunidad',d:'Steam Community',u:'https://steamcommunity.com/app/225840',h:'steamcommunity.com'}];
+const CATS=[
+  {id:'skins',t:'Skins',items:[
+    {t:'Sven Co-op Model Database',d:'Modelos de jugador con botón de descarga',u:'https://wootguy.github.io/pmodels/sc/'},
+    {t:'ModDB · Sven Co-op',d:'Skins y addons de la comunidad',u:'https://www.moddb.com/games/sven-co-op'}]},
+  {id:'maps',t:'Mapas y campañas',items:[
+    {t:'SCMapDB',d:'Wiki de mapas de Sven Co-op',u:'http://scmapdb.wikidot.com/'},
+    {t:'Cómo instalar mapas',d:'Guía oficial: van a svencoop_addon',u:'https://wiki.svencoop.com/Running_a_server/Installing_custom_maps'},
+    {t:'Mapas incluidos en el juego',d:'Manual oficial, con autor y nombre del .bsp',u:'https://svencoop.com/manual/maps.html'},
+    {t:'Colossal Sven Co-op Map Pack',d:'Noticia en ModDB',u:'https://www.moddb.com/news/colossal-sven-co-op-map-pack'},
+    {t:'Definitive Classic Pack',d:'Addon en ModDB',u:'https://www.moddb.com/addons/definitive-classic-pack'},
+    {t:'Grupo de Steam de SCMapDB',d:'Comunidad de mapas',u:'https://steamcommunity.com/groups/SCMapDB'}]},
+  {id:'mods',t:'Mods y sonidos',items:[
+    {t:'GameBanana · Mods',d:'Mods, sonidos, sprays y scripts para Sven Co-op',u:'https://gamebanana.com/mods/games/54'},
+    {t:'GameBanana · Sven Co-op',d:'Página principal del juego',u:'https://gamebanana.com/games/54'}]},
+  {id:'official',t:'Oficial',items:[
+    {t:'svencoop.com',d:'Archivos y noticias',u:'https://svencoop.com/'},
+    {t:'Wiki de Sven Co-op',d:'Guías y documentación',u:'https://wiki.svencoop.com/'},
+    {t:'Steam Community',d:'Foros y guías',u:'https://steamcommunity.com/app/225840'}]}];
+let modCat='skins';
 function renderSites(){
-  $('mod-sites').innerHTML=SITES.map((x,i)=>`<button class="site" data-i="${i}"><b>${x.t}</b><span>${x.d}</span><em>${x.h} ↗</em></button>`).join('');
+  $('mod-cats').innerHTML=CATS.map(c=>`<button data-c="${c.id}" class="${c.id===modCat?'on':''}">${c.t}<em>${c.items.length}</em></button>`).join('');
+  const c=CATS.find(x=>x.id===modCat);
+  $('mod-sites').innerHTML=c.items.map((x,i)=>`<div class="linkrow"><div class="nm"><b>${esc(x.t)}</b><span>${esc(x.d)}</span><em>${esc(new URL(x.u).host)}</em></div><button class="btn sm pri" data-i="${i}">Abrir ↗</button></div>`).join('');
 }
-$('mod-sites').onclick=async e=>{const b=e.target.closest('.site');if(!b)return;const r=await api('openurl',{url:SITES[b.dataset.i].u});if(!r.ok)toast(r.error||'No se pudo abrir')};
+$('mod-cats').onclick=e=>{const b=e.target.closest('button');if(!b)return;modCat=b.dataset.c;renderSites()};
+$('mod-sites').onclick=async e=>{const b=e.target.closest('button');if(!b)return;const it=CATS.find(x=>x.id===modCat).items[b.dataset.i];const r=await api('openurl',{url:it.u});if(!r.ok)toast(r.error||'No se pudo abrir')};
 const busyOn=t=>{$('busy-t').textContent=t;$('busy').classList.remove('hidden')},busyOff=()=>$('busy').classList.add('hidden');
 function upload(path,file,onp){return new Promise(res=>{
   const x=new XMLHttpRequest();x.open('POST','/api/'+path+'?file='+encodeURIComponent(file.name));x.setRequestHeader('X-Hub',TOKEN);
@@ -665,9 +696,11 @@ async function installMod(file){
   finally{modBusy=false}
 }
 async function loadMods(){
-  let list=[];try{list=(await api('mods')).mods||[]}catch(e){}
+  let list=[],ess=[];try{const r=await api('mods');list=r.mods||[];ess=r.essentials||[]}catch(e){}
+  $('mod-ess').innerHTML=ess.map(x=>`<div class="friend"><div class="av lock">${IC.lock}</div><div class="nm">${esc(x.name)}<span class="id">Necesario para que el Hub funcione</span></div>${x.ok?'<span class="okmark">✓</span>':'<button class="btn sm pri" data-fix="1">Reparar</button>'}</div>`).join('');
   $('mod-list').innerHTML=list.map(m=>`<div class="friend"><div class="av">${esc((m.name||'?')[0].toUpperCase())}</div><div class="nm">${esc(m.name)}<span class="id">${m.count} archivos · ${m.mb} MB · ${esc(m.date||'')}</span></div><button class="btn sm danger" data-id="${m.id}" data-n="${esc(m.name)}">Quitar</button></div>`).join('')||'<div class="note">Ningún mod instalado.</div>';
 }
+$('mod-ess').onclick=async e=>{if(!e.target.closest('[data-fix]'))return;busyOn('Reparando…');const r=await api('repair',{});busyOff();toast(r.ok?'Reparado':(r.error||'No se pudo reparar'));loadMods()};
 $('mod-list').onclick=async e=>{
   const b=e.target.closest('[data-id]');if(!b)return;
   if(!confirm(`¿Quitar "${b.dataset.n}"? Sus archivos van a la Papelera de reciclaje.`))return;
@@ -782,7 +815,7 @@ $('hl-repair').onclick=async()=>{
   const bad=renderHealth(r.items);info=await api('state');toast(bad?'Reparado en parte: revisa lo que sigue en rojo':'Todo reparado ✓');
 };
 $('hl-undo').onclick=async()=>{
-  if(!confirm('¿Quitar del juego lo que instaló el Hub?'))return;
+  if(!confirm('¿Quitar el plugin /tp y el atajo F8? Los comandos y /tp dejarán de funcionar hasta que pulses Reparar todo.'))return;
   const r=await api('undo',{});
   if(!r.ok){toast(r.error||'No se pudo deshacer');return}
   renderHealth(r.items);info=await api('state');render();toast('Cambios deshechos');

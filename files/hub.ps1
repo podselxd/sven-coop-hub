@@ -532,6 +532,13 @@ foreach ($try in 1..30) {
 if (-not $listener) { throw 'No pude abrir un puerto local.' }
 @{ pid = $PID; port = $port; token = $token } | ConvertTo-Json | Set-Content $RunFile -Encoding ASCII
 Remove-Item (Join-Path $Root 'update.pending') -Force -ErrorAction SilentlyContinue
+if ($game) {
+    $s0 = Read-Settings
+    $optedOut = ($s0 -and $null -ne $s0.autoRepair -and -not $s0.autoRepair)
+    if (-not $optedOut -and (-not (Test-Bind $game) -or -not (Test-Tp $game))) {
+        try { Repair-All $game; Log 'reparado automaticamente: faltaba el atajo F8 o el plugin /tp' } catch { Log "autorreparacion fallo: $($_.Exception.Message)" }
+    }
+}
 $user = Get-SteamUser
 $mapsCache = $null
 $lastPing = Get-Date
@@ -634,7 +641,7 @@ try {
                     catch { Send $ctx @{ ok = $false; error = $_.Exception.Message } }
                 }
                 '/api/modcancel' { $p = (Read-Body $ctx) | ConvertFrom-Json; Remove-PendingMod "$($p.id)"; Send $ctx @{ ok = $true } }
-                '/api/mods' { Send $ctx @{ mods = @(Get-InstalledMods $game) } }
+                '/api/mods' { Send $ctx @{ mods = @(Get-InstalledMods $game); essentials = @(Get-Essentials $game) } }
                 '/api/moddel' {
                     $p = (Read-Body $ctx) | ConvertFrom-Json
                     try { Remove-Mod $game "$($p.id)"; Send $ctx @{ ok = $true } }
@@ -648,11 +655,11 @@ try {
                 '/api/diag' { Send $ctx @{ text = (Get-Diag $game $user) } }
                 '/api/health' { Send $ctx @{ items = @(Get-Health $game $user) } }
                 '/api/repair' {
-                    try { Repair-All $game; Send $ctx @{ ok = $true; items = @(Get-Health $game $user) } }
+                    try { Repair-All $game; Set-Setting 'autoRepair' $true; Send $ctx @{ ok = $true; items = @(Get-Health $game $user) } }
                     catch { Send $ctx @{ ok = $false; error = $_.Exception.Message } }
                 }
                 '/api/undo' {
-                    try { Undo-All $game; Send $ctx @{ ok = $true; items = @(Get-Health $game $user) } }
+                    try { Undo-All $game; Set-Setting 'autoRepair' $false; Send $ctx @{ ok = $true; items = @(Get-Health $game $user) } }
                     catch { Send $ctx @{ ok = $false; error = $_.Exception.Message } }
                 }
                 '/api/steam' { Start-Process 'steam://open/main'; Send $ctx @{ ok = $true } }

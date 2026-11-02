@@ -329,6 +329,21 @@ $script:ModBlockedExt = 'dll', 'exe', 'bat', 'cmd', 'ps1', 'psm1', 'vbs', 'js', 
 $script:ModMax = 629145600   # 600 MB
 $script:OpenHosts = 'wootguy.github.io', 'scmapdb.wikidot.com', 'gamebanana.com', 'www.moddb.com', 'svencoop.com', 'www.svencoop.com', 'wiki.svencoop.com', 'steamcommunity.com'
 
+# Lo que hace funcionar al Hub no se puede reemplazar con un mod ni quitar desde el launcher
+$script:ProtectedRel = 'scripts/plugins/hubtp.as', 'scripts/plugins/teleport.as', 'scripts/plugins/admin/playermanagement.as'
+function Test-ProtectedRel([string]$rel) { $l = "$rel".ToLower(); ($script:ProtectedRel -contains $l) -or ($l -like 'scripts/plugins/hubtp*') }
+
+function Get-Essentials($game) {
+    $dp = ''
+    $f = Join-Path $game 'svencoop\default_plugins.txt'
+    if (Test-Path $f) { $dp = Get-Content $f -Raw }
+    return @(
+        @{ id = 'tp'; name = 'Plugin /tp'; detail = 'HubTP'; ok = [bool](Test-Tp $game) },
+        @{ id = 'sp'; name = 'Plugin Teleport (/s y /p)'; detail = 'Teleport'; ok = [bool]($dp -match '(?m)^\s*"script"\s+"Teleport"') },
+        @{ id = 'f8'; name = 'Atajo F8 de comandos'; detail = 'userconfig.cfg'; ok = [bool](Test-Bind $game) }
+    )
+}
+
 function Get-ModsDb($game) { Join-Path $game 'svencoop_addon\.hubmods' }
 
 # Ruta del zip -> ruta relativa dentro del juego (maps/x.bsp). $null = no es contenido de mod (readme...). Lanza error si es peligrosa.
@@ -336,8 +351,16 @@ function ConvertTo-ModRel([string]$full) {
     $n = $full.Replace('\', '/').Trim('/')
     if ($n -match '(^|/)\.\.(/|$)' -or $n -match ':') { throw "ruta no permitida: $full" }
     $seg = @($n -split '/')
-    if ($seg.Count -gt 1 -and @('svencoop_addon', 'svencoop', 'svencoop_downloads') -contains $seg[0].ToLower()) { $seg = @($seg[1..($seg.Count - 1)]) }
-    if ($seg.Count -gt 1 -and ($script:ModTopDirs -notcontains $seg[0].ToLower()) -and ($script:ModTopDirs -contains $seg[1].ToLower())) { $seg = @($seg[1..($seg.Count - 1)]) }   # carpeta envoltorio
+    $pref = 'svencoop_addon', 'svencoop', 'svencoop_downloads'
+    # quita hasta 3 capas de envoltorio: carpeta del zip (repo-main/), svencoop_addon/, etc.
+    for ($k = 0; $k -lt 3 -and $seg.Count -gt 1; $k++) {
+        $h = $seg[0].ToLower()
+        if ($script:ModTopDirs -contains $h) { break }
+        if ($pref -contains $h) { $seg = @($seg[1..($seg.Count - 1)]); continue }
+        $n2 = $seg[1].ToLower()
+        if ($script:ModTopDirs -contains $n2 -or $pref -contains $n2) { $seg = @($seg[1..($seg.Count - 1)]); continue }
+        break
+    }
     if ($seg.Count -lt 2 -or ($script:ModTopDirs -notcontains $seg[0].ToLower())) { return $null }
     foreach ($s in $seg) { if ($s -notmatch "^[A-Za-z0-9 _.\-&()\[\]']+$" -or $s.EndsWith('.') -or $s.EndsWith(' ')) { throw "nombre de archivo no permitido: $s" } }
     return ($seg -join '/')
@@ -366,6 +389,7 @@ function Save-PendingMod($game, $ctx, [string]$fileName) {
                 if ($script:ModBlockedExt -contains $ext) { if (-not $blocked) { $blocked = $e.Name }; continue }
                 $rel = ConvertTo-ModRel $e.FullName
                 if (-not $rel -or ($script:ModAllowedExt -notcontains $ext)) { $ignored++; continue }
+                if (Test-ProtectedRel $rel) { throw "$rel es parte del Hub y no se puede reemplazar con un mod." }
                 $total += $e.Length
                 if ($total -gt $script:ModMax) { throw 'Demasiado grande al descomprimir (max 600 MB).' }
                 if ($files.Count -ge 6000) { throw 'Demasiados archivos (max 6000).' }
@@ -449,6 +473,7 @@ function Remove-Mod($game, [string]$id) {
     Add-Type -AssemblyName Microsoft.VisualBasic
     $dirs = New-Object System.Collections.Generic.HashSet[string]
     foreach ($rel in @($m.files)) {
+        if (Test-ProtectedRel $rel) { continue }
         $full = [IO.Path]::GetFullPath((Join-Path $game ('svencoop_addon\' + "$rel".Replace('/', '\'))))
         if (-not $full.StartsWith($addonRoot + '\', [StringComparison]::OrdinalIgnoreCase)) { continue }
         if ([IO.File]::Exists($full)) {

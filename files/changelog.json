@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.7.0",
+    "date": "2026-11-02",
+    "notes": [
+      "Mods: lista por categorías (skins, mapas, mods, oficial) con enlace directo a cada sitio.",
+      "Lo que hace funcionar al Hub (plugin /tp, Teleport, atajo F8) aparece como esencial: no se puede quitar ni reemplazar con un mod, y se repara solo si falta.",
+      "El instalador de mods entiende los zips de GitHub.",
+      "Skins: las del juego quedan ocultas solas; «Mis skins» muestra solo las tuyas.",
+      "Unirme: tarjeta compacta de una sola fila."
+    ]
+  },
+  {
     "version": "1.6.0",
     "date": "2026-11-02",
     "notes": [

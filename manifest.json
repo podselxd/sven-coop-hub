@@ -1,14 +1,14 @@
 {
-    "version":  "1.6.0",
+    "version":  "1.7.0",
     "released":  "2026-11-02",
     "files":  [
                   {
                       "path":  "hub.ps1",
-                      "sha256":  "bf56722319728dfc68193cf4cf81e720f6201f8514ae2408b621a6ba66b3140a"
+                      "sha256":  "cfe604ce9cc5e3c24e49b51cfcdb7af52f5c710e5e3d4bb4f7fd2eb7a917b073"
                   },
                   {
                       "path":  "lib.ps1",
-                      "sha256":  "a7e0c0d90d1a475052de37911c1397e1a3abee95f323ef05888e332a763f1796"
+                      "sha256":  "d4d026f071eabd98eebc1bcd4c02c87723ec9711f9ff847937cb16956c68a080"
                   },
                   {
                       "path":  "update.ps1",
@@ -20,7 +20,7 @@
                   },
                   {
                       "path":  "web/index.html",
-                      "sha256":  "3cc3f3238edec41ffc0efa684c55cecf0fd4192f632d85f1e459831769d93fb6"
+                      "sha256":  "7c18284e2166dfeddb8c85d2861135239a2fa21a00a4c05a98e5b48e724216a3"
                   },
                   {
                       "path":  "plugins/HubTP.as",
@@ -28,7 +28,7 @@
                   },
                   {
                       "path":  "changelog.json",
-                      "sha256":  "6178080065e3a2d7018413746fb222a090550739def59eab19eb476c8d965c1c"
+                      "sha256":  "6132534aef4acbafb10e437fa75691cef8e7fa563e7fd1ce2650d4fd8dfb93b9"
                   }
               ]
 }
