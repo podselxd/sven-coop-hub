@@ -1,4 +1,4 @@
-param([switch]$SkipBuild, [switch]$DocsOnly, [switch]$Release, [string]$Repo = 'podselxd/sven-coop-hub')
+﻿param([switch]$SkipBuild, [switch]$DocsOnly, [switch]$Release, [string]$Repo = 'podselxd/sven-coop-hub')
 # publish.ps1 - publica la version actual para que los Hub la descarguen solos.
 # 1) build.ps1 (todas las comprobaciones)  2) manifest.json con SHA-256 de cada archivo  3) firma con tu llave privada
 # 4) git push al repositorio  5) comprobacion de punta a punta: se descarga desde internet y se verifica la firma.
