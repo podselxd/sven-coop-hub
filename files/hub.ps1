@@ -465,7 +465,7 @@ function Open-Window($url) {
     if (-not $edge) { $edge = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe' -ErrorAction SilentlyContinue).'(default)' }
     if ($edge) {
         $prof = Join-Path $Root '.browser-profile'
-        return Start-Process -FilePath $edge -ArgumentList @("--app=$url", '--window-size=1280,860', "--user-data-dir=`"$prof`"", '--no-first-run', '--no-default-browser-check', '--disable-extensions', '--disable-sync', '--disable-features=Translate') -PassThru
+        return Start-Process -FilePath $edge -ArgumentList @("--app=$url", '--start-maximized', "--user-data-dir=`"$prof`"", '--no-first-run', '--no-default-browser-check', '--disable-extensions', '--disable-sync', '--disable-features=Translate') -PassThru
     }
     Start-Process $url | Out-Null
     return $null
@@ -494,7 +494,7 @@ if (Test-Path $pendingFile) {
         # ya lo intento una vez y no llego a confirmar el arranque
         Log "la v$($pend[0]) no llego a arrancar: se vuelve a la anterior"
         Restore-Previous
-        Start-Process powershell -ArgumentList $hubArgs
+        Start-PSHidden $hubArgs | Out-Null
         exit 0
     }
     [IO.File]::WriteAllText($pendingFile, "$($pend[0]),1")   # primer arranque de la version nueva
@@ -507,7 +507,7 @@ if (-not $NoUpdate -and -not $checkedRecently) {
     if ($up.status -in 'al-dia', 'omitida', 'disabled') { [IO.File]::WriteAllText($checkedFile, '') }
     if ($up.status -eq 'actualizado') {
         # se abre la version nueva y se vigila: si no llega a confirmar su arranque, se vuelve a la anterior
-        $child = Start-Process powershell -ArgumentList $hubArgs -PassThru
+        $child = Start-PSHidden $hubArgs
         for ($i = 0; $i -lt 60; $i++) {
             Start-Sleep -Milliseconds 500
             if (-not (Test-Path $pendingFile)) { break }
@@ -516,7 +516,7 @@ if (-not $NoUpdate -and -not $checkedRecently) {
         if (Test-Path $pendingFile) {
             Log 'la version nueva no arranco: se vuelve a la anterior'
             Restore-Previous
-            Start-Process powershell -ArgumentList $hubArgs
+            Start-PSHidden $hubArgs | Out-Null
         }
         exit 0
     }
@@ -717,5 +717,5 @@ finally {
     Stop-Overlay
     try { $listener.Stop() } catch {}
     Remove-Item $RunFile -ErrorAction SilentlyContinue
-    if ($script:Relaunch) { Start-Process powershell -ArgumentList $hubArgs }
+    if ($script:Relaunch) { Start-PSHidden $hubArgs | Out-Null }
 }

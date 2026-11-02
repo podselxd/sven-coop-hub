@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.8.1",
+    "date": "2026-11-02",
+    "notes": [
+      "Si el Hub se cierra mientras la ventana sigue abierta, la ventana lo avisa y ofrece reintentar o cerrarse.",
+      "El Hub abre su ventana maximizada.",
+      "Ya no se abren ventanas de PowerShell/Terminal mientras juegas.",
+      "Supervivencia: solo On u Off, y viene apagada."
+    ]
+  },
+  {
     "version": "1.8.0",
     "date": "2026-11-02",
     "notes": [

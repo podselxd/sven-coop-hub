@@ -293,7 +293,7 @@ function Start-Overlay([int]$Port, [string]$Token, [int]$Button = 1, [int]$Card 
     $f = Join-Path $Root 'overlay.ps1'
     if (-not (Test-Path $f)) { return }
     $gp = ''; if ($game) { $gp = $game }
-    $script:OverlayProc = Start-Process powershell -PassThru -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-STA', '-WindowStyle', 'Hidden', '-File', "`"$f`"", '-Port', $Port, '-Token', $Token, '-HubPid', $PID, '-Root', "`"$Root`"", '-Game', "`"$gp`"", '-Button', $Button, '-Card', $Card)
+    $script:OverlayProc = Start-PSHidden @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-STA', '-WindowStyle', 'Hidden', '-File', "`"$f`"", '-Port', $Port, '-Token', $Token, '-HubPid', $PID, '-Root', "`"$Root`"", '-Game', "`"$gp`"", '-Button', $Button, '-Card', $Card)
 }
 
 # Segun los ajustes: boton flotante (overlay, apagado por defecto) y tarjeta de /tp (tpcard, encendida por defecto)
@@ -503,4 +503,16 @@ function Open-AllowedUrl([string]$Url) {
 function Remove-PendingMod([string]$id) {
     if ($id -notmatch '^[a-f0-9]{12}$') { return }
     Remove-Item (Join-Path $Root "cache\pending\$id.zip"), (Join-Path $Root "cache\pending\$id.json") -Force -ErrorAction SilentlyContinue
+}
+
+# Lanza un powershell SIN consola (CreateNoWindow). Start-Process -WindowStyle Hidden no basta: en Windows 11 abre un instante
+# una ventana de Terminal que le quita el foco al juego.
+function Start-PSHidden([string[]]$ArgList) {
+    $psi = New-Object Diagnostics.ProcessStartInfo
+    $psi.FileName = 'powershell.exe'
+    $psi.Arguments = ($ArgList -join ' ')
+    $psi.UseShellExecute = $false
+    $psi.CreateNoWindow = $true
+    $psi.WorkingDirectory = $Root
+    return [Diagnostics.Process]::Start($psi)
 }

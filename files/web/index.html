@@ -221,12 +221,15 @@ textarea{resize:vertical}
 .cc:hover{border-color:var(--hev)}
 .cc code{font:600 13px Consolas,monospace;color:var(--hev);min-width:140px}
 .cc span{color:var(--mute);font-size:12.5px}
+#lost{position:sticky;top:0;z-index:60;background:#3a1416;border-bottom:1px solid #8a2b30;color:#ffd7d7;padding:11px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+#lost span{color:#e8b4b4;font-size:13px;flex:1;min-width:200px}
 .hidden{display:none!important}
 .single{grid-column:1/-1;max-width:760px;margin:0 auto;width:100%}
 @media(max-width:900px){main{grid-template-columns:1fr}.rules{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
+<div id="lost" class="hidden"><b>Se perdió la conexión con el Hub.</b><span>Ábrelo de nuevo desde su acceso directo o el .exe.</span><button class="btn sm" id="lost-retry">Reintentar</button><button class="btn sm" id="lost-close">Cerrar ventana</button></div>
 <header>
   <div class="logo">
     <button class="logo-btn" id="logo-btn" title="Cambiar logo"></button>
@@ -283,7 +286,7 @@ textarea{resize:vertical}
     <h2>Partida</h2>
     <div class="rule"><div><b>Trucos</b></div><label class="sw"><input type="checkbox" id="r-cheats"><i></i></label></div>
     <div class="rule"><div><b>Modo clásico</b></div><label class="sw"><input type="checkbox" id="r-classic"><i></i></label></div>
-    <div class="rule"><div><b>Supervivencia</b></div><div class="seg" id="r-survival"><button data-v="-1">Según mapa</button><button data-v="1">On</button><button data-v="0">Off</button></div></div>
+    <div class="rule"><div><b>Supervivencia</b></div><div class="seg" id="r-survival"><button data-v="1">On</button><button data-v="0">Off</button></div></div>
     <div class="rule"><div><b>Reaparición (seg)</b></div><input type="number" id="r-respawn" min="0" max="60"></div>
     <div class="rule"><div><b>Jugadores máx.</b><span><em id="v-max" style="font-style:normal"></em> jugadores</span></div><input type="range" id="r-max" min="2" max="32"></div>
   </section>
@@ -423,13 +426,14 @@ textarea{resize:vertical}
 
 <script>
 const TOKEN='__TOKEN__';
+let pingFail=0;
 const CHAPTERS=[
  ['hl_c00','Black Mesa Inbound'],['hl_c01_a1','Anomalous Materials'],['hl_c02_a1','Unforeseen Consequences'],
  ['hl_c03','Office Complex'],['hl_c04',"We've Got Hostiles"],['hl_c05_a1','Blast Pit'],['hl_c06','Power Up'],
  ['hl_c07_a1','On A Rail'],['hl_c08_a1','Apprehension'],['hl_c09','Residue Processing'],['hl_c10','Questionable Ethics'],
  ['hl_c11_a1','Surface Tension'],['hl_c12','Forget About Freeman!'],['hl_c13_a1','Lambda Core'],['hl_c14','Xen'],
  ['hl_c15',"Gonarch's Lair"],['hl_c16_a1','Interloper'],['hl_c17','Nihilanth'],['hl_c18','Endgame']];
-const DEF={map:'hl_c00',maxplayers:8,cheats:true,respawn:5,classic:true,survival:-1,screen:'full',minimize:true,logo:'hex',fav:[],hid:[],overlay:false,tpcard:true,model:'',top:0,bottom:0,extra:'',autoCopy:true,friends:[],hosts:[],lastJoin:''};
+const DEF={map:'hl_c00',maxplayers:8,cheats:true,respawn:5,classic:true,survival:0,screen:'full',minimize:true,logo:'hex',fav:[],hid:[],overlay:false,tpcard:true,model:'',top:0,bottom:0,extra:'',autoCopy:true,friends:[],hosts:[],lastJoin:''};
 let S={...DEF}, info={}, running=false;
 const $=id=>document.getElementById(id);
 async function api(p,body){
@@ -789,6 +793,8 @@ async function pollLoading(){
   loadT=setTimeout(pollLoading,450);
 }
 $('ld-close').onclick=hideLoading;
+$('lost-retry').onclick=async()=>{try{await api('ping');pingFail=0;$('lost').classList.add('hidden');toast('Conectado otra vez')}catch(e){toast('El Hub sigue sin responder')}};
+$('lost-close').onclick=()=>window.close();
 $('steam-open').onclick=async()=>{await api('steam',{});toast('Abriendo Steam…')};
 
 // ---- salud del Hub ----
@@ -887,13 +893,14 @@ document.addEventListener('click',e=>{if(!e.target.closest('.logo'))$('logo-pop'
 (async()=>{
   info=await api('state');
   S={...DEF,...(info.settings||{})};
+  if(S.survival!==1)S.survival=0;   // antes existia «Según mapa» (-1): pasa a Off
   if(!CHAPTERS.some(c=>c[0]===S.map))S.map='hl_c00';
   applyLogo();renderAbout();
   $('j-text').value=S.lastJoin||'';
   running=info.running;render();
   if(!info.gamePath)toast('No encontré Sven Co-op');
   else api('health').then(h=>{const bad=(h.items||[]).filter(i=>i.level==='bad'&&i.id!=='steam').length;if(bad)toast('Hay problemas: abre Ajustes')}).catch(()=>{});
-  setInterval(async()=>{try{const r=await api('ping');if(r.tab)tab(r.tab);if(S.overlay&&r.overlay===false){S.overlay=false;$('r-overlay').checked=false}const sc=r.steam!==info.steamRunning;info.steamRunning=r.steam;if(sc){$('d-steam').classList.toggle('ok',!!r.steam);$('t-steam').textContent=r.steam?'Steam conectado':'Steam cerrado';$('steam-warn').classList.toggle('hidden',!!r.steam)}if(r.running!==running||sc)setRunning(r.running)}catch(e){}},4000);
+  setInterval(async()=>{try{const r=await api('ping');if(r.tab)tab(r.tab);if(S.overlay&&r.overlay===false){S.overlay=false;$('r-overlay').checked=false}const sc=r.steam!==info.steamRunning;info.steamRunning=r.steam;if(sc){$('d-steam').classList.toggle('ok',!!r.steam);$('t-steam').textContent=r.steam?'Steam conectado':'Steam cerrado';$('steam-warn').classList.toggle('hidden',!!r.steam)}if(r.running!==running||sc)setRunning(r.running);pingFail=0;$('lost').classList.add('hidden')}catch(e){if(++pingFail>=3)$('lost').classList.remove('hidden')}},4000);
 })();
 </script>
 </body>
